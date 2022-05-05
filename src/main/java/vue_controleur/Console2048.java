@@ -22,10 +22,10 @@ public class Console2048 extends Thread implements Observer {
     @Override
     public void run() {
         while(true) {
-            afficher();
+            draw();
 
             synchronized (this) {
-                ecouteEvennementClavier();
+                listenKeyEvent();
                 try {
                     wait(); // lorsque le processus s'endort, le verrou sur this est relâché, ce qui permet au processus de ecouteEvennementClavier()
                     // d'entrer dans la partie synchronisée, ce verrou évite que le réveil du processus de la console (update(..)) ne soit exécuté avant
@@ -42,7 +42,7 @@ public class Console2048 extends Thread implements Observer {
     /**
      * Correspond à la fonctionnalité de Contrôleur : écoute les évènements, et déclenche des traitements sur le modèle
      */
-    private void ecouteEvennementClavier() {
+    private void listenKeyEvent() {
 
         final Object _this = this;
 
@@ -62,7 +62,7 @@ public class Console2048 extends Thread implements Observer {
 
                         if (s.equals("4") || s.equals("8") || s.equals("6") || s.equals("2") ) {
                             end = true;
-                            jeu.rnd();
+                            jeu.fillGrid();
                         }
                     }
 
@@ -78,7 +78,7 @@ public class Console2048 extends Thread implements Observer {
     /**
      * Correspond à la fonctionnalité de Vue : affiche les données du modèle
      */
-    private void afficher()  {
+    private void draw()  {
 
 
         System.out.printf("\033[H\033[J"); // permet d'effacer la console (ne fonctionne pas toujours depuis la console de l'IDE)
@@ -87,7 +87,7 @@ public class Console2048 extends Thread implements Observer {
             for (int j = 0; j < jeu.getSize(); j++) {
                 Case c = jeu.getCase(i, j);
                 if (c != null) {
-                    System.out.format("%5.5s", c.getValeur());
+                    System.out.format("%5.5s", c.getValue());
                 } else {
                     System.out.format("%5.5s", "");
                 }
@@ -98,7 +98,7 @@ public class Console2048 extends Thread implements Observer {
 
     }
 
-    private void raffraichir() {
+    private void refresh() {
         synchronized (this) {
             try {
                 notify();
@@ -111,6 +111,6 @@ public class Console2048 extends Thread implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        raffraichir();
+        refresh();
     }
 }

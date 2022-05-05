@@ -25,7 +25,7 @@ public class Location {
         int x = rdm.nextInt(bound);
         int y = rdm.nextInt(bound);
 
-        return new Location(x, y);
+        return new Location(y, x);
     }
 
     @Override

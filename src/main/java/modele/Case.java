@@ -1,14 +1,14 @@
 package modele;
 
 public class Case {
-    private final int valeur;
+    private final int value;
 
-    public Case(int _valeur) {
-        valeur = _valeur;
+    public Case(int value) {
+        this.value = value;
     }
 
-    public int getValeur() {
-        return valeur;
+    public int getValue() {
+        return value;
     }
 
 }
