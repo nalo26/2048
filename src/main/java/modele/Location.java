@@ -2,12 +2,14 @@ package modele;
 
 import java.util.Random;
 
+import static modele.Jeu.RANDOM;
+
 public class Location {
 
     private final int row;
     private final int col;
 
-    public Location(int row, int col) {
+    public Location(int col, int row) {
         this.row = row;
         this.col = col;
     }
@@ -21,14 +23,19 @@ public class Location {
     }
 
     public static Location generateRandomLocation(int bound) {
-        Random rdm = Jeu.RANDOM;
+        Random rdm = RANDOM;
         int x = rdm.nextInt(bound);
         int y = rdm.nextInt(bound);
 
         return new Location(x, y);
     }
 
+    public static Location locationAddition(Location left, Location right) {
+        return new Location(left.getCol() + right.getCol(), left.getRow() + right.getRow());
+    }
+
     @Override
+
     public int hashCode() {
         final int prime = 31;
         int result = 1;
