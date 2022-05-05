@@ -11,4 +11,7 @@ public class Case {
         return value;
     }
 
+    public Case merge(Case case1, Case case2) {
+        return new Case(case1.getValue() + case2.getValue());
+    }
 }
