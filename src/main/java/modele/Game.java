@@ -19,29 +19,31 @@ public class Game extends Observable {
         return tabCases.length;
     }
 
-    public Case getCase(Location loc) {
+    public Case getCase(Location loc) throws ArrayIndexOutOfBoundsException {
         return tabCases[loc.getRow()][loc.getCol()];
     }
 
-    public Case getCase(int col, int row) {
+    public Case getCase(int col, int row) throws ArrayIndexOutOfBoundsException {
         return tabCases[row][col];
     }
 
-    public void setCase(Case givenCase, Location loc) {
+    public void setCase(Case givenCase, Location loc) throws ArrayIndexOutOfBoundsException {
         tabCases[loc.getRow()][loc.getCol()] = givenCase;
     }
 
     public void move(Direction direction) {
-        for(int y = 0; y < getSize(); y++) {
-            for(int x = 0; x < getSize(); x++) {
+        for (int y = 0; y < getSize(); y++) {
+            for (int x = 0; x < getSize(); x++) {
                 Case currentCase = getCase(x, y);
-                if(currentCase == null) continue;
+                if (currentCase == null) continue;
                 currentCase.move(direction);
             }
         }
+        setChanged();
+        notifyObservers();
     }
 
-    public void moveCase(Direction direction, Case currentCase) {
+    public void moveCase(Direction direction, Case currentCase) throws ArrayIndexOutOfBoundsException {
         Location locationToAdd = direction.getLocation();
         Location oldLocation = getCaseLocation(currentCase);
         Location newLocation = locationAddition(locationToAdd, oldLocation);
@@ -49,7 +51,7 @@ public class Game extends Observable {
         setCase(null, oldLocation);
     }
 
-    public Case getNeighbour(Direction direction, Case givenCase) {
+    public Case getNeighbour(Direction direction, Case givenCase) throws ArrayIndexOutOfBoundsException {
         Location locationToAdd = direction.getLocation();
         Location currentLocation = getCaseLocation(givenCase);
         return getCase(locationAddition(locationToAdd, currentLocation));

@@ -14,10 +14,19 @@ public class Case {
     }
 
     public void move(Direction direction) {
-        Case neighbour = game.getNeighbour(direction, this);
-        if(neighbour != null) {
-            game.moveCase(direction, this);
+        try {
+            Case neighbour = game.getNeighbour(direction, this);
+            while (neighbour == null) {
+
+                game.moveCase(direction, this);
+
+                neighbour = game.getNeighbour(direction, this);
+
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println(direction);
         }
     }
+
 
 }

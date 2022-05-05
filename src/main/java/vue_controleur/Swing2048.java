@@ -11,6 +11,8 @@ import java.awt.event.KeyEvent;
 import java.util.Observable;
 import java.util.Observer;
 
+import static modele.Direction.*;
+
 public class Swing2048 extends JFrame implements Observer {
     private static final int PIXEL_PER_SQUARE = 60;
     // tableau de cases : i, j -> case graphique
@@ -84,16 +86,16 @@ public class Swing2048 extends JFrame implements Observer {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {  // on regarde quelle touche a été pressée
                     case KeyEvent.VK_LEFT:
-                        game.fillGrid();
+                        game.move(LEFT);
                         break;
                     case KeyEvent.VK_RIGHT:
-                        game.fillGrid();
+                        game.move(RIGHT);
                         break;
                     case KeyEvent.VK_DOWN:
-                        game.fillGrid();
+                        game.move(DOWN);
                         break;
                     case KeyEvent.VK_UP:
-                        game.fillGrid();
+                        game.move(UP);
                         break;
                 }
             }
