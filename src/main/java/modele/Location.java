@@ -2,7 +2,7 @@ package modele;
 
 import java.util.Random;
 
-import static modele.Jeu.RANDOM;
+import static modele.Game.RANDOM;
 
 public class Location {
 
