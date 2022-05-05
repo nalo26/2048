@@ -1,7 +1,7 @@
 package vue_controleur;
 
 import modele.Case;
-import modele.Jeu;
+import modele.Game;
 
 import java.io.IOException;
 import java.util.Observable;
@@ -9,11 +9,11 @@ import java.util.Observer;
 
 public class Console2048 extends Thread implements Observer {
 
-    private Jeu jeu;
+    private Game game;
 
 
-    public Console2048(Jeu _jeu) {
-        jeu = _jeu;
+    public Console2048(Game _jeu) {
+        game = _jeu;
 
     }
 
@@ -61,7 +61,7 @@ public class Console2048 extends Thread implements Observer {
 
                         if (s.equals("4") || s.equals("8") || s.equals("6") || s.equals("2")) {
                             end = true;
-                            jeu.fillGrid();
+                            game.fillGrid();
                         }
                     }
 
@@ -82,9 +82,9 @@ public class Console2048 extends Thread implements Observer {
 
         System.out.printf("\033[H\033[J"); // permet d'effacer la console (ne fonctionne pas toujours depuis la console de l'IDE)
 
-        for (int i = 0; i < jeu.getSize(); i++) {
-            for (int j = 0; j < jeu.getSize(); j++) {
-                Case c = jeu.getCase(j, i);
+        for (int i = 0; i < game.getSize(); i++) {
+            for (int j = 0; j < game.getSize(); j++) {
+                Case c = game.getCase(j, i);
                 if (c != null) {
                     System.out.format("%5.5s", c.getValue());
                 } else {

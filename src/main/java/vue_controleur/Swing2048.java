@@ -3,7 +3,7 @@ package vue_controleur;
 import javax.swing.*;
 import javax.swing.border.Border;
 import modele.Case;
-import modele.Jeu;
+import modele.Game;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -15,20 +15,20 @@ public class Swing2048 extends JFrame implements Observer {
     private static final int PIXEL_PER_SQUARE = 60;
     // tableau de cases : i, j -> case graphique
     private JLabel[][] tabC;
-    private Jeu jeu;
+    private Game game;
 
 
-    public Swing2048(Jeu _jeu) {
-        jeu = _jeu;
+    public Swing2048(Game _jeu) {
+        game = _jeu;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(jeu.getSize() * PIXEL_PER_SQUARE, jeu.getSize() * PIXEL_PER_SQUARE);
-        tabC = new JLabel[jeu.getSize()][jeu.getSize()];
+        setSize(game.getSize() * PIXEL_PER_SQUARE, game.getSize() * PIXEL_PER_SQUARE);
+        tabC = new JLabel[game.getSize()][game.getSize()];
 
 
-        JPanel contentPane = new JPanel(new GridLayout(jeu.getSize(), jeu.getSize()));
+        JPanel contentPane = new JPanel(new GridLayout(game.getSize(), game.getSize()));
 
-        for (int i = 0; i < jeu.getSize(); i++) {
-            for (int j = 0; j < jeu.getSize(); j++) {
+        for (int i = 0; i < game.getSize(); i++) {
+            for (int j = 0; j < game.getSize(); j++) {
                 Border border = BorderFactory.createLineBorder(Color.darkGray, 5);
                 tabC[i][j] = new JLabel();
                 tabC[i][j].setBorder(border);
@@ -54,9 +54,9 @@ public class Swing2048 extends JFrame implements Observer {
         SwingUtilities.invokeLater(new Runnable() { // demande au processus graphique de réaliser le traitement
             @Override
             public void run() {
-                for (int i = 0; i < jeu.getSize(); i++) {
-                    for (int j = 0; j < jeu.getSize(); j++) {
-                        Case c = jeu.getCase(j, i);
+                for (int i = 0; i < game.getSize(); i++) {
+                    for (int j = 0; j < game.getSize(); j++) {
+                        Case c = game.getCase(j, i);
 
                         if (c == null) {
 
@@ -84,16 +84,16 @@ public class Swing2048 extends JFrame implements Observer {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {  // on regarde quelle touche a été pressée
                     case KeyEvent.VK_LEFT:
-                        jeu.fillGrid();
+                        game.fillGrid();
                         break;
                     case KeyEvent.VK_RIGHT:
-                        jeu.fillGrid();
+                        game.fillGrid();
                         break;
                     case KeyEvent.VK_DOWN:
-                        jeu.fillGrid();
+                        game.fillGrid();
                         break;
                     case KeyEvent.VK_UP:
-                        jeu.fillGrid();
+                        game.fillGrid();
                         break;
                 }
             }
