@@ -32,9 +32,15 @@ public class Jeu extends Observable {
                         r = rnd.nextInt(3);
 
                         switch (r) {
-                            case 0 -> tabCases[i][j] = null;
-                            case 1 -> tabCases[i][j] = new Case(2);
-                            case 2 -> tabCases[i][j] = new Case(4);
+                            case 0 :
+                                tabCases[i][j] = null;
+                                break;
+                            case 1 :
+                                tabCases[i][j] = new Case(2);
+                                break;
+                            case 2 :
+                                tabCases[i][j] = new Case(4);
+                                break;
                         }
                     }
                 }
