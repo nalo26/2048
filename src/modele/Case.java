@@ -1,7 +1,7 @@
 package modele;
 
 public class Case {
-    private int valeur;
+    private final int valeur;
 
     public Case(int _valeur) {
         valeur = _valeur;
