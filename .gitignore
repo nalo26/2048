@@ -1,1 +1,5 @@
 .idea
+.vscode/
+target/
+out/
+2048.iml
