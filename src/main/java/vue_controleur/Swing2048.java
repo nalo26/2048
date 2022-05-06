@@ -5,12 +5,20 @@ import javax.swing.border.Border;
 import modele.Case;
 import modele.Game;
 
-import java.awt.*;
+import static javax.swing.BorderFactory.createLineBorder;
+import static javax.swing.SwingConstants.CENTER;
+import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import static java.awt.Color.*;
 import static modele.Direction.*;
 import static modele.Game.EMPTY_CASE;
 
@@ -19,24 +27,28 @@ public class Swing2048 extends JFrame implements Observer {
     // tableau de cases : i, j -> case graphique
     private JLabel[][] tabC;
     private Game game;
-
+    private final Map<Integer, Color> caseColor;
+    private final List<CaseColors> colorList = List.of(CaseColors.values());
 
     public Swing2048(Game _jeu) {
         game = _jeu;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(game.getSize() * PIXEL_PER_SQUARE, game.getSize() * PIXEL_PER_SQUARE);
         tabC = new JLabel[game.getSize()][game.getSize()];
-
-
+        caseColor = IntStream.rangeClosed(1, 10).map(val -> (int) Math.pow(2, val)).boxed()
+                .collect(Collectors.toMap(value -> value, value -> colorList.get((int) (Math.sqrt(value) - 1)).getColor()));
+        System.out.println(caseColor);
         JPanel contentPane = new JPanel(new GridLayout(game.getSize(), game.getSize()));
 
+        Border border = createLineBorder(darkGray, 5);
         for (int i = 0; i < game.getSize(); i++) {
             for (int j = 0; j < game.getSize(); j++) {
-                Border border = BorderFactory.createLineBorder(Color.darkGray, 5);
                 tabC[i][j] = new JLabel();
+                tabC[i][j].setOpaque(true);
                 tabC[i][j].setBorder(border);
-                tabC[i][j].setHorizontalAlignment(SwingConstants.CENTER);
-
+                tabC[i][j].setHorizontalAlignment(CENTER);
+                tabC[i][j].setForeground(WHITE);
+                tabC[i][j].setBackground(LIGHT_GRAY);
 
                 contentPane.add(tabC[i][j]);
 

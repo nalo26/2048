@@ -5,7 +5,7 @@ public enum Direction {
 
     private final Location location;
 
-    private Direction(int x, int y) {
+    Direction(int x, int y) {
         this.location = new Location(x, y);
     }
 
