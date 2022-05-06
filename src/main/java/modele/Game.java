@@ -37,7 +37,8 @@ public class Game extends Observable {
             for (int y = 0; y < getSize(); y++) {
                 for (int x = 0; x < getSize(); x++) {
                     Case currentCase = getCase(x, y);
-                    if (currentCase == null) continue;
+                    if (currentCase == null)
+                        continue;
                     currentCase.move(direction);
                 }
             }
@@ -45,12 +46,14 @@ public class Game extends Observable {
             for (int y = getSize() - 1; y >= 0; y--) {
                 for (int x = getSize() - 1; x >= 0; x--) {
                     Case currentCase = getCase(x, y);
-                    if (currentCase == null) continue;
+                    if (currentCase == null)
+                        continue;
                     currentCase.move(direction);
                 }
             }
         }
-        generateRandomCase();
+        if (!isGameOver())
+            generateRandomCase();
 
         setChanged();
         notifyObservers();
@@ -93,6 +96,28 @@ public class Game extends Observable {
         } while (getCase(location) != null);
         Case caseToAdd = new Case(this, (RANDOM.nextInt(2) + 1) * 2);
         tabCases[location.getRow()][location.getCol()] = caseToAdd;
+    }
+
+    public boolean isGameOver() {
+        Case currentCase, neighbour;
+        for (int y = 0; y < getSize(); y++) {
+            for (int x = 0; x < getSize(); x++) {
+                currentCase = getCase(x, y);
+                if (currentCase == null)
+                    return false;
+                for (Direction direction : Direction.values()) {
+                    try {
+                        neighbour = getNeighbour(direction, currentCase);
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        continue;
+                    }
+                    if (neighbour != null && neighbour.getValue() == currentCase.getValue()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     public void fillGrid() {
