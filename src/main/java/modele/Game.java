@@ -1,9 +1,11 @@
 package modele;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Random;
 
+import static java.util.Arrays.asList;
 import static modele.Location.locationAddition;
 
 public class Game extends Observable {
@@ -11,33 +13,60 @@ public class Game extends Observable {
     private final Case[][] tabCases;
     public static final Random RANDOM = new Random(10);
 
-    public Game(int size) {
+    private static final List<Location> BORDERS = new ArrayList<>();
+    public static final Case EMPTY_CASE = new Case(-1);
+    private static Game INSTANCE = null;
+
+    private Game(int size) {
         tabCases = new Case[size][size];
         fillGrid();
+        generateBorders();
+    }
+
+    public static Game init(int size) {
+        if (INSTANCE == null) {
+            INSTANCE = new Game(size);
+        }
+        return INSTANCE;
+    }
+
+    public static Game getInstance() {
+        return INSTANCE;
+    }
+
+    private void generateBorders() {
+        int gridSize = getSize();
+        for (int y = 0; y < gridSize; y++) {
+            for (int x = 0; x < gridSize; x++) {
+                if (x == 0 || y == 0 || x == gridSize - 1 || y == gridSize - 1) {
+                    BORDERS.add(new Location(x, y));
+                }
+            }
+        }
     }
 
     public int getSize() {
         return tabCases.length;
     }
 
-    public Case getCase(Location loc) throws ArrayIndexOutOfBoundsException {
+    public Case getCase(Location loc) {
         return tabCases[loc.getRow()][loc.getCol()];
     }
 
-    public Case getCase(int col, int row) throws ArrayIndexOutOfBoundsException {
+    public Case getCase(int col, int row) {
         return tabCases[row][col];
     }
 
-    public void setCase(Case givenCase, Location loc) throws ArrayIndexOutOfBoundsException {
+    public void setCase(Case givenCase, Location loc) {
         tabCases[loc.getRow()][loc.getCol()] = givenCase;
     }
 
     public void move(Direction direction) {
-        if (Arrays.asList(Direction.LEFT, Direction.UP).contains(direction)) {
+        if (asList(Direction.LEFT, Direction.UP).contains(direction)) {
             for (int y = 0; y < getSize(); y++) {
                 for (int x = 0; x < getSize(); x++) {
                     Case currentCase = getCase(x, y);
-                    if (currentCase == null) continue;
+                    if (currentCase == EMPTY_CASE) continue;
                     currentCase.move(direction);
                 }
             }
@@ -45,7 +74,7 @@ public class Game extends Observable {
             for (int y = getSize() - 1; y >= 0; y--) {
                 for (int x = getSize() - 1; x >= 0; x--) {
                     Case currentCase = getCase(x, y);
-                    if (currentCase == null) continue;
+                    if (currentCase == EMPTY_CASE) continue;
                     currentCase.move(direction);
                 }
             }
@@ -56,23 +85,48 @@ public class Game extends Observable {
         notifyObservers();
     }
 
+    public boolean isPossibleLocation(Direction direction, Location caseLocation) {
+
+        if (BORDERS.contains(caseLocation)) {
+            switch (direction) {
+                case UP:
+                    return caseLocation.getRow() != 0;
+                case LEFT:
+                    return caseLocation.getCol() != 0;
+                case DOWN:
+                    return caseLocation.getRow() != getSize() - 1;
+                case RIGHT:
+                    return caseLocation.getCol() != getSize() - 1;
+
+            }
+        }
+        return true;
+    }
+
     public void deleteCase(Case caseToDelete) {
         Location location = getCaseLocation(caseToDelete);
-        setCase(null, location);
+        setCase(EMPTY_CASE, location);
     }
 
-    public void moveCase(Direction direction, Case currentCase) throws ArrayIndexOutOfBoundsException {
-        Location locationToAdd = direction.getLocation();
-        Location oldLocation = getCaseLocation(currentCase);
-        Location newLocation = locationAddition(locationToAdd, oldLocation);
-        setCase(currentCase, newLocation);
-        setCase(null, oldLocation);
+    public boolean moveCase(Direction direction, Case currentCase) {
+        if (isPossibleLocation(direction, getCaseLocation(currentCase))) {
+            Location locationToAdd = direction.getLocation();
+            Location oldLocation = getCaseLocation(currentCase);
+            Location newLocation = locationAddition(locationToAdd, oldLocation);
+            setCase(currentCase, newLocation);
+            setCase(EMPTY_CASE, oldLocation);
+            return true;
+        }
+        return false;
     }
 
-    public Case getNeighbour(Direction direction, Case givenCase) throws ArrayIndexOutOfBoundsException {
-        Location locationToAdd = direction.getLocation();
-        Location currentLocation = getCaseLocation(givenCase);
-        return getCase(locationAddition(locationToAdd, currentLocation));
+    public Case getNeighbour(Direction direction, Case givenCase) {
+        Location caseLocation = getCaseLocation(givenCase);
+        if (isPossibleLocation(direction, caseLocation)) {
+            Location locationToAdd = direction.getLocation();
+            return getCase(locationAddition(locationToAdd, caseLocation));
+        }
+        return null;
     }
 
     public Location getCaseLocation(Case givenCase) {
@@ -90,8 +144,8 @@ public class Game extends Observable {
         Location location;
         do {
             location = Location.generateRandomLocation(getSize());
-        } while (getCase(location) != null);
-        Case caseToAdd = new Case(this, (RANDOM.nextInt(2) + 1) * 2);
+        } while (getCase(location) != EMPTY_CASE);
+        Case caseToAdd = new Case((RANDOM.nextInt(2) + 1) * 2);
         tabCases[location.getRow()][location.getCol()] = caseToAdd;
     }
 
@@ -101,7 +155,7 @@ public class Game extends Observable {
             // fill the grid of nothing
             for (int y = 0; y < getSize(); y++) {
                 for (int x = 0; x < getSize(); x++) {
-                    tabCases[y][x] = null;
+                    tabCases[y][x] = EMPTY_CASE;
                 }
             }
 

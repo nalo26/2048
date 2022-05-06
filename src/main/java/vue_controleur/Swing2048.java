@@ -12,6 +12,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import static modele.Direction.*;
+import static modele.Game.EMPTY_CASE;
 
 public class Swing2048 extends JFrame implements Observer {
     private static final int PIXEL_PER_SQUARE = 60;
@@ -60,7 +61,7 @@ public class Swing2048 extends JFrame implements Observer {
                     for (int j = 0; j < game.getSize(); j++) {
                         Case c = game.getCase(j, i);
 
-                        if (c == null) {
+                        if (c == EMPTY_CASE) {
 
                             tabC[i][j].setText("");
 

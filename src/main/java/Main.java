@@ -11,7 +11,7 @@ public class Main {
     }
 
     public static void mainConsole() {
-        Game jeu = new Game(4);
+        Game jeu = Game.init(4);
         Console2048 vue = new Console2048(jeu);
         jeu.addObserver(vue);
 
@@ -20,8 +20,7 @@ public class Main {
     }
 
     public static void mainSwing() {
-
-        Game jeu = new Game(4);
+        Game jeu = Game.init(4);
         Swing2048 vue = new Swing2048(jeu);
         jeu.addObserver(vue);
 
@@ -29,7 +28,6 @@ public class Main {
 
 
     }
-
 
 
 }
