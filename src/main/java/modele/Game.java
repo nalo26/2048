@@ -2,6 +2,7 @@ package modele;
 
 import java.util.Observable;
 import java.util.Random;
+import java.util.Arrays;
 
 import static modele.Location.locationAddition;
 
@@ -32,13 +33,25 @@ public class Game extends Observable {
     }
 
     public void move(Direction direction) {
-        for (int y = 0; y < getSize(); y++) {
-            for (int x = 0; x < getSize(); x++) {
-                Case currentCase = getCase(x, y);
-                if (currentCase == null) continue;
-                currentCase.move(direction);
+        if(Arrays.asList(Direction.LEFT, Direction.UP).contains(direction)) {
+            for (int y = 0; y < getSize(); y++) {
+                for (int x = 0; x < getSize(); x++) {
+                    Case currentCase = getCase(x, y);
+                    if (currentCase == null) continue;
+                    currentCase.move(direction);
+                }
+            }
+        } else {
+            for (int y = getSize()-1; y >= 0; y--) {
+                for (int x = getSize()-1; x >= 0; x--) {
+                    Case currentCase = getCase(x, y);
+                    if (currentCase == null) continue;
+                    currentCase.move(direction);
+                }
             }
         }
+        generateRandomCase();
+
         setChanged();
         notifyObservers();
     }
@@ -68,6 +81,15 @@ public class Game extends Observable {
         return null;
     }
 
+    public void generateRandomCase() {
+        Location location;
+        do {
+            location = Location.generateRandomLocation(getSize());
+        } while(getCase(location) != null);
+        Case caseToAdd = new Case(this, (RANDOM.nextInt(2) + 1) * 2);
+        tabCases[location.getRow()][location.getCol()] = caseToAdd;
+    }
+
     public void fillGrid() {
         new Thread(() -> { // permet de libérer le processus graphique ou de la console
 
@@ -78,16 +100,8 @@ public class Game extends Observable {
                 }
             }
 
-            // generate 2 positions for starting cells
-            Location randomLocation1 = Location.generateRandomLocation(getSize());
-            Location randomLocation2;
-            do {
-                randomLocation2 = Location.generateRandomLocation(getSize());
-            } while (randomLocation2.equals(randomLocation1));
-
-            // generate value for the 2 starting cells and putting them on grid
-            tabCases[randomLocation1.getRow()][randomLocation1.getCol()] = new Case(this, (RANDOM.nextInt(2) + 1) * 2);
-            tabCases[randomLocation2.getRow()][randomLocation2.getCol()] = new Case(this, (RANDOM.nextInt(2) + 1) * 2);
+            generateRandomCase();
+            generateRandomCase();
 
         }).start();
 

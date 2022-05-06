@@ -17,16 +17,12 @@ public class Case {
         try {
             Case neighbour = game.getNeighbour(direction, this);
             while (neighbour == null) {
-
                 game.moveCase(direction, this);
-
                 neighbour = game.getNeighbour(direction, this);
-
             }
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.err.println(direction);
+
         }
     }
-
 
 }
