@@ -1,15 +1,15 @@
 package modele;
 
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.Random;
-import java.util.Arrays;
 
 import static modele.Location.locationAddition;
 
 public class Game extends Observable {
 
     private final Case[][] tabCases;
-    public static final Random RANDOM = new Random(4);
+    public static final Random RANDOM = new Random(10);
 
     public Game(int size) {
         tabCases = new Case[size][size];
@@ -33,7 +33,7 @@ public class Game extends Observable {
     }
 
     public void move(Direction direction) {
-        if(Arrays.asList(Direction.LEFT, Direction.UP).contains(direction)) {
+        if (Arrays.asList(Direction.LEFT, Direction.UP).contains(direction)) {
             for (int y = 0; y < getSize(); y++) {
                 for (int x = 0; x < getSize(); x++) {
                     Case currentCase = getCase(x, y);
@@ -42,8 +42,8 @@ public class Game extends Observable {
                 }
             }
         } else {
-            for (int y = getSize()-1; y >= 0; y--) {
-                for (int x = getSize()-1; x >= 0; x--) {
+            for (int y = getSize() - 1; y >= 0; y--) {
+                for (int x = getSize() - 1; x >= 0; x--) {
                     Case currentCase = getCase(x, y);
                     if (currentCase == null) continue;
                     currentCase.move(direction);
@@ -54,6 +54,11 @@ public class Game extends Observable {
 
         setChanged();
         notifyObservers();
+    }
+
+    public void deleteCase(Case caseToDelete) {
+        Location location = getCaseLocation(caseToDelete);
+        setCase(null, location);
     }
 
     public void moveCase(Direction direction, Case currentCase) throws ArrayIndexOutOfBoundsException {
@@ -85,7 +90,7 @@ public class Game extends Observable {
         Location location;
         do {
             location = Location.generateRandomLocation(getSize());
-        } while(getCase(location) != null);
+        } while (getCase(location) != null);
         Case caseToAdd = new Case(this, (RANDOM.nextInt(2) + 1) * 2);
         tabCases[location.getRow()][location.getCol()] = caseToAdd;
     }
