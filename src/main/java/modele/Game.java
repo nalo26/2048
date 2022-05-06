@@ -79,7 +79,8 @@ public class Game extends Observable {
                 }
             }
         }
-        generateRandomCase();
+        if (!isGameOver())
+            generateRandomCase();
 
         setChanged();
         notifyObservers();
@@ -147,6 +148,24 @@ public class Game extends Observable {
         } while (getCase(location) != EMPTY_CASE);
         Case caseToAdd = new Case((RANDOM.nextInt(2) + 1) * 2);
         tabCases[location.getRow()][location.getCol()] = caseToAdd;
+    }
+
+    public boolean isGameOver() {
+        Case currentCase, neighbour;
+        for (int y = 0; y < getSize(); y++) {
+            for (int x = 0; x < getSize(); x++) {
+                currentCase = getCase(x, y);
+                if (currentCase == EMPTY_CASE)
+                    return false;
+                for (Direction direction : Direction.values()) {
+                    neighbour = getNeighbour(direction, currentCase);
+                    if (neighbour != null && neighbour.getValue() == currentCase.getValue()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     public void fillGrid() {
