@@ -5,6 +5,9 @@ import javax.swing.border.Border;
 import modele.Case;
 import modele.Game;
 
+import static java.lang.Math.log;
+import static java.lang.Math.pow;
+import static java.util.Arrays.asList;
 import static javax.swing.BorderFactory.createLineBorder;
 import static javax.swing.SwingConstants.CENTER;
 import java.awt.Color;
@@ -28,16 +31,15 @@ public class Swing2048 extends JFrame implements Observer {
     private JLabel[][] tabC;
     private Game game;
     private final Map<Integer, Color> caseColor;
-    private final List<CaseColors> colorList = List.of(CaseColors.values());
+    private final List<CaseColors> colorList = asList(CaseColors.values());
 
     public Swing2048(Game _jeu) {
         game = _jeu;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(game.getSize() * PIXEL_PER_SQUARE, game.getSize() * PIXEL_PER_SQUARE);
         tabC = new JLabel[game.getSize()][game.getSize()];
-        caseColor = IntStream.rangeClosed(1, 10).map(val -> (int) Math.pow(2, val)).boxed()
-                .collect(Collectors.toMap(value -> value, value -> colorList.get((int) (Math.sqrt(value) - 1)).getColor()));
-        System.out.println(caseColor);
+        caseColor = IntStream.rangeClosed(1, 10).map(val -> (int) pow(2, val)).boxed()
+                .collect(Collectors.toMap(value -> value, value -> colorList.get((int) (log(value) / log(2))).getColor()));
         JPanel contentPane = new JPanel(new GridLayout(game.getSize(), game.getSize()));
 
         Border border = createLineBorder(darkGray, 5);
@@ -48,7 +50,7 @@ public class Swing2048 extends JFrame implements Observer {
                 tabC[i][j].setBorder(border);
                 tabC[i][j].setHorizontalAlignment(CENTER);
                 tabC[i][j].setForeground(WHITE);
-                tabC[i][j].setBackground(LIGHT_GRAY);
+
 
                 contentPane.add(tabC[i][j]);
 
@@ -76,9 +78,10 @@ public class Swing2048 extends JFrame implements Observer {
                         if (c == EMPTY_CASE) {
 
                             tabC[i][j].setText("");
-
+                            tabC[i][j].setBackground(WHITE);
                         } else {
                             tabC[i][j].setText(c.getValue() + "");
+                            tabC[i][j].setBackground(caseColor.get(c.getValue()));
                         }
 
 
