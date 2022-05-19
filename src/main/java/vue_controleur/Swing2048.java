@@ -3,17 +3,20 @@ package vue_controleur;
 import javax.swing.*;
 import javax.swing.border.Border;
 import modele.Case;
+import modele.Direction;
 import modele.Game;
 
-import static java.lang.Math.log;
-import static java.lang.Math.pow;
-import static java.util.Arrays.asList;
+import static javax.imageio.ImageIO.read;
 import static javax.swing.BorderFactory.createLineBorder;
 import static javax.swing.SwingConstants.CENTER;
-import java.awt.Color;
-import java.awt.GridLayout;
+import static javax.swing.SwingConstants.LEFT;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -21,12 +24,17 @@ import java.util.Observer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.awt.Color.*;
+import static java.awt.BorderLayout.PAGE_START;
+import static java.awt.Color.WHITE;
+import static java.awt.Color.darkGray;
+import static java.lang.Math.log;
+import static java.lang.Math.pow;
+import static java.util.Arrays.asList;
 import static modele.Direction.*;
 import static modele.Game.EMPTY_CASE;
 
 public class Swing2048 extends JFrame implements Observer {
-    private static final int PIXEL_PER_SQUARE = 60;
+    private static final int PIXEL_PER_SQUARE = 150;
     // tableau de cases : i, j -> case graphique
     private JLabel[][] tabC;
     private Game game;
@@ -36,12 +44,19 @@ public class Swing2048 extends JFrame implements Observer {
     public Swing2048(Game _jeu) {
         game = _jeu;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(game.getSize() * PIXEL_PER_SQUARE, game.getSize() * PIXEL_PER_SQUARE);
+        setSize((game.getSize() * PIXEL_PER_SQUARE), (int) ((game.getSize() + 0.5) * PIXEL_PER_SQUARE));
+
+
+        Container mainContent = getContentPane();
+        mainContent.setLayout(new BorderLayout());
+        Component topComponent = endScreen();
+        mainContent.add(topComponent, PAGE_START);
+
         tabC = new JLabel[game.getSize()][game.getSize()];
         caseColor = IntStream.rangeClosed(1, 10).map(val -> (int) pow(2, val)).boxed()
                 .collect(Collectors.toMap(value -> value, value -> colorList.get((int) (log(value) / log(2))).getColor()));
-        JPanel contentPane = new JPanel(new GridLayout(game.getSize(), game.getSize()));
-
+        JPanel contentPanel = new JPanel(new GridLayout(game.getSize(), game.getSize()));
+        contentPanel.setSize(game.getSize() * PIXEL_PER_SQUARE, game.getSize() * PIXEL_PER_SQUARE);
         Border border = createLineBorder(darkGray, 5);
         for (int i = 0; i < game.getSize(); i++) {
             for (int j = 0; j < game.getSize(); j++) {
@@ -50,13 +65,14 @@ public class Swing2048 extends JFrame implements Observer {
                 tabC[i][j].setBorder(border);
                 tabC[i][j].setHorizontalAlignment(CENTER);
                 tabC[i][j].setForeground(WHITE);
+                tabC[i][j].setFont(new Font(tabC[i][j].getFont().getName(), Font.BOLD, 45));
 
-
-                contentPane.add(tabC[i][j]);
+                contentPanel.add(tabC[i][j]);
 
             }
         }
-        setContentPane(contentPane);
+        mainContent.add(contentPanel);
+        setContentPane(mainContent);
         addKeyListener();
         refresh();
 
@@ -65,32 +81,61 @@ public class Swing2048 extends JFrame implements Observer {
 
     /**
      * Correspond à la fonctionnalité de Vue : affiche les données du modèle
+     * 🤡🤡🤡
      */
     private void refresh() {
 
-        SwingUtilities.invokeLater(new Runnable() { // demande au processus graphique de réaliser le traitement
-            @Override
-            public void run() {
-                for (int i = 0; i < game.getSize(); i++) {
-                    for (int j = 0; j < game.getSize(); j++) {
-                        Case c = game.getCase(j, i);
+        // demande au processus graphique de réaliser le traitement
+        SwingUtilities.invokeLater(() -> {
+            for (int i = 0; i < game.getSize(); i++) {
+                for (int j = 0; j < game.getSize(); j++) {
+                    Case c = game.getCase(j, i);
 
-                        if (c == EMPTY_CASE) {
+                    if (c == EMPTY_CASE) {
 
-                            tabC[i][j].setText("");
-                            tabC[i][j].setBackground(WHITE);
-                        } else {
-                            tabC[i][j].setText(c.getValue() + "");
-                            tabC[i][j].setBackground(caseColor.get(c.getValue()));
-                        }
-
-
+                        tabC[i][j].setText("");
+                        tabC[i][j].setBackground(WHITE);
+                    } else {
+                        tabC[i][j].setText(c.getValue() + "");
+                        tabC[i][j].setBackground(caseColor.get(c.getValue()));
                     }
+
+
                 }
+            }
+            if (game.isGameOver()) {
+                endScreen();
             }
         });
 
 
+    }
+
+    private Component endScreen() {
+        JPanel endScreen = new JPanel(new BorderLayout(game.getSize(), game.getSize()));
+        endScreen.setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, PIXEL_PER_SQUARE / 2));
+        endScreen.setBackground(Color.BLACK);
+        endScreen.setOpaque(false);
+        endScreen.setForeground(Color.BLACK);
+
+        JLabel endLabel = new JLabel("2048", LEFT);
+        endLabel.setFont(new Font(endLabel.getFont().getName(), Font.BOLD, 46));
+        endScreen.add(endLabel, BorderLayout.CENTER);
+        JLabel restartClickableLabel = new JLabel();
+        try {
+            BufferedImage icon = read(new File("src/main/resources/restartIcon.png"));
+            restartClickableLabel.setIcon(new ImageIcon((icon.getScaledInstance(55, 60, Image.SCALE_SMOOTH))));
+        } catch (Exception e) {
+            restartClickableLabel.setText("restart");
+        }
+        restartClickableLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                game.restart();
+            }
+        });
+        endScreen.add(restartClickableLabel, BorderLayout.EAST);
+        return endScreen;
     }
 
     /**
@@ -102,7 +147,7 @@ public class Swing2048 extends JFrame implements Observer {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {  // on regarde quelle touche a été pressée
                     case KeyEvent.VK_LEFT:
-                        game.move(LEFT);
+                        game.move(Direction.LEFT);
                         break;
                     case KeyEvent.VK_RIGHT:
                         game.move(RIGHT);
