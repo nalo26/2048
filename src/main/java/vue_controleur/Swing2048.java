@@ -30,8 +30,8 @@ import static java.awt.Color.darkGray;
 import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import static java.util.Arrays.asList;
-import static modele.Direction.*;
 import static modele.Case.EMPTY_CASE;
+import static modele.Direction.*;
 
 public class Swing2048 extends JFrame implements Observer {
     private static final int PIXEL_PER_SQUARE = 150;
@@ -49,7 +49,7 @@ public class Swing2048 extends JFrame implements Observer {
 
         Container mainContent = getContentPane();
         mainContent.setLayout(new BorderLayout());
-        Component topComponent = endScreen();
+        Component topComponent = generateTopComponent();
         mainContent.add(topComponent, PAGE_START);
 
         tabC = new JLabel[game.getSize()][game.getSize()];
@@ -104,14 +104,14 @@ public class Swing2048 extends JFrame implements Observer {
                 }
             }
             if (game.isGameOver()) {
-                endScreen();
+                generateTopComponent();
             }
         });
 
 
     }
 
-    private Component endScreen() {
+    private Component generateTopComponent() {
         JPanel endScreen = new JPanel(new BorderLayout(game.getSize(), game.getSize()));
         endScreen.setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, PIXEL_PER_SQUARE / 2));
         endScreen.setBackground(Color.BLACK);
