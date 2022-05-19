@@ -10,7 +10,7 @@ import static modele.Location.locationAddition;
 
 public class Game extends Observable {
 
-    private final Case[][] tabCases;
+    private Case[][] tabCases;
     public static final Random RANDOM = new Random(10);
 
     private static final List<Location> BORDERS = new ArrayList<>();
@@ -62,26 +62,27 @@ public class Game extends Observable {
     }
 
     public void move(Direction direction) {
-        if (asList(Direction.LEFT, Direction.UP).contains(direction)) {
-            for (int y = 0; y < getSize(); y++) {
-                for (int x = 0; x < getSize(); x++) {
-                    Case currentCase = getCase(x, y);
-                    if (currentCase == EMPTY_CASE) continue;
-                    currentCase.move(direction);
+        new Thread(() -> {
+            if (asList(Direction.LEFT, Direction.UP).contains(direction)) {
+                for (int y = 0; y < getSize(); y++) {
+                    for (int x = 0; x < getSize(); x++) {
+                        Case currentCase = getCase(x, y);
+                        if (currentCase == EMPTY_CASE) continue;
+                        currentCase.move(direction);
+                    }
+                }
+            } else {
+                for (int y = getSize() - 1; y >= 0; y--) {
+                    for (int x = getSize() - 1; x >= 0; x--) {
+                        Case currentCase = getCase(x, y);
+                        if (currentCase == EMPTY_CASE) continue;
+                        currentCase.move(direction);
+                    }
                 }
             }
-        } else {
-            for (int y = getSize() - 1; y >= 0; y--) {
-                for (int x = getSize() - 1; x >= 0; x--) {
-                    Case currentCase = getCase(x, y);
-                    if (currentCase == EMPTY_CASE) continue;
-                    currentCase.move(direction);
-                }
-            }
-        }
-        if (!isGameOver())
-            generateRandomCase();
-
+            if (!isGameOver())
+                generateRandomCase();
+        }).start();
         setChanged();
         notifyObservers();
     }
@@ -188,4 +189,12 @@ public class Game extends Observable {
 
     }
 
+
+    public void restart() {
+        tabCases = new Case[getSize()][getSize()];
+        fillGrid();
+        generateBorders();
+        setChanged();
+        notifyObservers();
+    }
 }
