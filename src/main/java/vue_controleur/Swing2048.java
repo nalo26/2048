@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
 
 import static java.awt.Color.*;
 import static modele.Direction.*;
-import static modele.Game.EMPTY_CASE;
+import static modele.Case.EMPTY_CASE;
 
 public class Swing2048 extends JFrame implements Observer {
     private static final int PIXEL_PER_SQUARE = 60;

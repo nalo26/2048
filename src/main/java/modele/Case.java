@@ -1,10 +1,10 @@
 package modele;
 
-import static modele.Game.EMPTY_CASE;
 import static modele.Game.getInstance;
 
 public class Case {
-    private final Game game = getInstance();
+    public static final Case EMPTY_CASE = new Case(-1);
+
     private int value;
 
     public Case(int value) {
@@ -19,19 +19,25 @@ public class Case {
         this.value += otherCase.getValue();
     }
 
-    public void move(Direction direction) {
+    public Boolean move(Direction direction) {
+        Game game = getInstance();
+        Boolean as_moved = false;
 
         Case neighbour = game.getNeighbour(direction, this);
         while (neighbour == EMPTY_CASE) {
+            as_moved = true;
             if (!game.moveCase(direction, this)) {
-                return;
+                return as_moved;
             }
             neighbour = game.getNeighbour(direction, this);
         }
-        if (neighbour != null && neighbour.getValue() == this.value) {
+        if (neighbour == null) return as_moved;
+        if (neighbour.getValue() == this.value){
+            as_moved = true;
             neighbour.merge(this);
             game.deleteCase(this);
-        }
+        } 
+        return as_moved;
     }
 
 }
