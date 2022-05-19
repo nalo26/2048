@@ -31,7 +31,7 @@ import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import static java.util.Arrays.asList;
 import static modele.Direction.*;
-import static modele.Game.EMPTY_CASE;
+import static modele.Case.EMPTY_CASE;
 
 public class Swing2048 extends JFrame implements Observer {
     private static final int PIXEL_PER_SQUARE = 150;

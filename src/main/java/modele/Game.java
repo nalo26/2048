@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Random;
 
+import static modele.Case.EMPTY_CASE;
 import static java.util.Arrays.asList;
 import static modele.Location.locationAddition;
 
@@ -14,7 +15,6 @@ public class Game extends Observable {
     public static final Random RANDOM = new Random(10);
 
     private static final List<Location> BORDERS = new ArrayList<>();
-    public static final Case EMPTY_CASE = new Case(-1);
     private static Game INSTANCE = null;
 
     private Game(int size) {
@@ -63,12 +63,13 @@ public class Game extends Observable {
 
     public void move(Direction direction) {
         new Thread(() -> {
+            int move_count = 0;
             if (asList(Direction.LEFT, Direction.UP).contains(direction)) {
                 for (int y = 0; y < getSize(); y++) {
                     for (int x = 0; x < getSize(); x++) {
                         Case currentCase = getCase(x, y);
                         if (currentCase == EMPTY_CASE) continue;
-                        currentCase.move(direction);
+                        move_count += currentCase.move(direction) ? 1 : 0;
                     }
                 }
             } else {
@@ -76,15 +77,15 @@ public class Game extends Observable {
                     for (int x = getSize() - 1; x >= 0; x--) {
                         Case currentCase = getCase(x, y);
                         if (currentCase == EMPTY_CASE) continue;
-                        currentCase.move(direction);
+                        move_count += currentCase.move(direction) ? 1 : 0;
                     }
                 }
             }
-            if (!isGameOver())
+            if (!isGameOver() && move_count != 0)
                 generateRandomCase();
+            setChanged();
+            notifyObservers();
         }).start();
-        setChanged();
-        notifyObservers();
     }
 
     public boolean isPossibleLocation(Direction direction, Location caseLocation) {
