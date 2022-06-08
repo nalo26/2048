@@ -11,8 +11,8 @@ public class RandomAI implements AI {
         this.game = game;
     }
 
-    public void play() {
+    public Direction play() {
         int random = Game.RANDOM.nextInt(4);
-        this.game.move(Direction.values()[random]);
+        return Direction.values()[random];
     }
 }

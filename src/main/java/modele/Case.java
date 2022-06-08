@@ -1,14 +1,18 @@
 package modele;
 
-import static modele.Game.getInstance;
-
 public class Case {
     public static final Case EMPTY_CASE = new Case(-1);
 
     private int value;
+    private Game game;
 
     public Case(int value) {
         this.value = value;
+    }
+
+    public Case(int value, Game game) {
+        this(value);
+        this.game = game;
     }
 
     public int getValue() {
@@ -20,7 +24,6 @@ public class Case {
     }
 
     public Boolean move(Direction direction) {
-        Game game = getInstance();
         Boolean as_moved = false;
 
         Case neighbour = game.getNeighbour(direction, this);

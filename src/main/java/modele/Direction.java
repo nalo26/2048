@@ -12,4 +12,8 @@ public enum Direction {
     public Location getLocation() {
         return this.location;
     }
+
+    public static Direction randomDirection() {
+        return Direction.values()[Game.RANDOM.nextInt(4)];
+    }
 }

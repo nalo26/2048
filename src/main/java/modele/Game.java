@@ -9,29 +9,17 @@ import static modele.Case.EMPTY_CASE;
 import static java.util.Arrays.asList;
 import static modele.Location.locationAddition;
 
-public class Game extends Observable {
+public class Game extends Observable implements Cloneable{
 
     private Case[][] tabCases;
     public static final Random RANDOM = new Random(10);
 
-    private static final List<Location> BORDERS = new ArrayList<>();
-    private static Game INSTANCE = null;
+    private final List<Location> borders = new ArrayList<>();
 
-    private Game(int size) {
+    public Game(int size) {
         tabCases = new Case[size][size];
         fillGrid();
         generateBorders();
-    }
-
-    public static Game init(int size) {
-        if (INSTANCE == null) {
-            INSTANCE = new Game(size);
-        }
-        return INSTANCE;
-    }
-
-    public static Game getInstance() {
-        return INSTANCE;
     }
 
     private void generateBorders() {
@@ -39,7 +27,7 @@ public class Game extends Observable {
         for (int y = 0; y < gridSize; y++) {
             for (int x = 0; x < gridSize; x++) {
                 if (x == 0 || y == 0 || x == gridSize - 1 || y == gridSize - 1) {
-                    BORDERS.add(new Location(x, y));
+                    borders.add(new Location(x, y));
                 }
             }
         }
@@ -90,7 +78,7 @@ public class Game extends Observable {
 
     public boolean isPossibleLocation(Direction direction, Location caseLocation) {
 
-        if (BORDERS.contains(caseLocation)) {
+        if (borders.contains(caseLocation)) {
             switch (direction) {
                 case UP:
                     return caseLocation.getRow() != 0;
@@ -170,6 +158,16 @@ public class Game extends Observable {
         return true;
     }
 
+    public boolean isGameWon() {
+        for(int y = 0; y < getSize(); y++) {
+            for(int x = 0; x < getSize(); x++) {
+                if(getCase(x, y).getValue() >= 2048)
+                    return true;
+            }
+        }
+        return false;
+    }
+
     public void fillGrid() {
         new Thread(() -> { // permet de libérer le processus graphique ou de la console
 
@@ -190,7 +188,6 @@ public class Game extends Observable {
 
     }
 
-
     public void restart() {
         tabCases = new Case[getSize()][getSize()];
         fillGrid();
@@ -198,4 +195,10 @@ public class Game extends Observable {
         setChanged();
         notifyObservers();
     }
+    
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
 }

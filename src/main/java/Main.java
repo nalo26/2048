@@ -1,12 +1,6 @@
-import javax.swing.*;
 import modele.Game;
 import vue_controleur.Console2048;
-import vue_controleur.MainMenu;
-
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
-import java.awt.*;
-
-import static vue_controleur.Swing2048.PIXEL_PER_SQUARE;
+import vue_controleur.Swing2048;
 
 public class Main {
 
