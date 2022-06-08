@@ -8,8 +8,9 @@ import modele.Game;
 import static javax.imageio.ImageIO.read;
 import static javax.swing.BorderFactory.createLineBorder;
 import static javax.swing.SwingConstants.CENTER;
-import static javax.swing.SwingConstants.LEFT;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -28,6 +29,7 @@ import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import static java.util.Arrays.asList;
 import static modele.Case.EMPTY_CASE;
+import static modele.Direction.*;
 
 public class Swing2048 extends JPanel implements Observer {
     public static final int PIXEL_PER_SQUARE = 150;
@@ -39,10 +41,7 @@ public class Swing2048 extends JPanel implements Observer {
 
     public Swing2048(Game _jeu) {
         game = _jeu;
-        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //setSize((game.getSize() * PIXEL_PER_SQUARE), (int) ((game.getSize() + 0.5) * PIXEL_PER_SQUARE));
-
-
+        addKeyListener();
         Container mainContent = new Container();
         mainContent.setLayout(new BorderLayout());
         Component topComponent = generateTopComponent();
@@ -113,7 +112,7 @@ public class Swing2048 extends JPanel implements Observer {
         endScreen.setOpaque(false);
         endScreen.setForeground(Color.BLACK);
 
-        JLabel endLabel = new JLabel("2048", LEFT);
+        JLabel endLabel = new JLabel("2048", SwingConstants.LEFT);
         endLabel.setFont(new Font(endLabel.getFont().getName(), Font.BOLD, 46));
         endScreen.add(endLabel, BorderLayout.CENTER);
         JLabel restartClickableLabel = new JLabel();
@@ -133,6 +132,33 @@ public class Swing2048 extends JPanel implements Observer {
         return endScreen;
     }
 
+
+    /**
+     * Correspond à la fonctionnalité de Contrôleur : écoute les évènements, et déclenche des traitements sur le modèle
+     *
+     * @return
+     */
+    public void addKeyListener() {
+        addKeyListener(new KeyAdapter() { // new KeyAdapter() { ... } est une instance de classe anonyme, il s'agit d'un objet qui correspond au controleur dans MVC
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {  // on regarde quelle touche a été pressée
+                    case KeyEvent.VK_LEFT:
+                        game.move(LEFT);
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                        game.move(RIGHT);
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        game.move(DOWN);
+                        break;
+                    case KeyEvent.VK_UP:
+                        game.move(UP);
+                        break;
+                }
+            }
+        });
+    }
 
     @Override
     public void update(Observable o, Object arg) {
