@@ -1,5 +1,7 @@
 package ia;
 
+import modele.Direction;
+
 public interface AI {
-    public void play();
+    public Direction play();
 }
