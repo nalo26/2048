@@ -3,9 +3,12 @@ package vue_controleur;
 import javax.swing.*;
 import modele.Game;
 
+import static javax.imageio.ImageIO.read;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.NORTH;
@@ -20,9 +23,15 @@ public class MainMenu extends JPanel {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, (int) ((game.getSize() + 0.5) * PIXEL_PER_SQUARE)));
 
-        JLabel title = new JLabel("2048 GAME");
-        title.setFont(new Font("serif", Font.BOLD, 100));
-        title.setForeground(Color.RED);
+        JLabel title = new JLabel();
+        try {
+            BufferedImage icon = read(new File("src/main/resources/2048Title.png"));
+            title.setIcon(new ImageIcon((icon.getScaledInstance(500, 85, Image.SCALE_SMOOTH))));
+        } catch (Exception e) {
+            title.setText("2048 GAME");
+            title.setFont(new Font("serif", Font.BOLD, 100));
+            title.setForeground(Color.GREEN);
+        }
         title.setVerticalAlignment(JLabel.NORTH);
         title.setHorizontalAlignment(JLabel.CENTER);
         add(title, NORTH);

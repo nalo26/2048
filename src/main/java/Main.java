@@ -12,8 +12,8 @@ public class Main {
 
     public static void main(String[] args) {
         //mainConsole();
+        System.setProperty("java2d.uiScale", "2.5");
         mainSwing();
-
     }
 
     public static void mainConsole() {
