@@ -9,7 +9,7 @@ import static java.util.Arrays.asList;
 import static modele.Case.EMPTY_CASE;
 import static modele.Location.locationAddition;
 
-public class Game extends Observable {
+public class Game extends Observable implements Cloneable{
 
     private Case[][] tabCases;
     public static final Random RANDOM = new Random(10);
@@ -45,12 +45,12 @@ public class Game extends Observable {
         return tabCases[row][col];
     }
 
-    public void setCase(Case givenCase, Location loc) {
+    public void setCase(Case givenCase, Location loc) throws ArrayIndexOutOfBoundsException {
         tabCases[loc.getRow()][loc.getCol()] = givenCase;
     }
 
     public void move(Direction direction) {
-        new Thread(() -> {
+        // new Thread(() -> {
             int move_count = 0;
             if (asList(Direction.LEFT, Direction.UP).contains(direction)) {
                 for (int y = 0; y < getSize(); y++) {
@@ -75,7 +75,7 @@ public class Game extends Observable {
             resetCellsMergeState();
             setChanged();
             notifyObservers();
-        }).start();
+        // }).start();
     }
 
     private void resetCellsMergeState() {
@@ -114,8 +114,12 @@ public class Game extends Observable {
             Location locationToAdd = direction.getLocation();
             Location oldLocation = getCaseLocation(currentCase);
             Location newLocation = locationAddition(locationToAdd, oldLocation);
-            setCase(currentCase, newLocation);
-            setCase(EMPTY_CASE, oldLocation);
+            try {
+                setCase(currentCase, newLocation);
+                setCase(EMPTY_CASE, oldLocation);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("Oopsi woopsi, I did oopsi daddy!");
+            }
             return true;
         }
         return false;
@@ -123,6 +127,9 @@ public class Game extends Observable {
 
     public Case getNeighbour(Direction direction, Case givenCase) {
         Location caseLocation = getCaseLocation(givenCase);
+        if(caseLocation == null){
+            System.out.println("caseLocation is null");
+        }
         if (isPossibleLocation(direction, caseLocation)) {
             Location locationToAdd = direction.getLocation();
             return getCase(locationAddition(locationToAdd, caseLocation));
@@ -179,7 +186,7 @@ public class Game extends Observable {
     }
 
     public void fillGrid() {
-        new Thread(() -> { // permet de libérer le processus graphique ou de la console
+        // new Thread(() -> { // permet de libérer le processus graphique ou de la console
 
             // fill the grid of nothing
             for (int y = 0; y < getSize(); y++) {
@@ -190,8 +197,7 @@ public class Game extends Observable {
 
             generateRandomCase();
             generateRandomCase();
-
-        }).start();
+        // }).start();
 
         setChanged();
         notifyObservers();
@@ -209,7 +215,14 @@ public class Game extends Observable {
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+        // return super.clone();
+        Game clone = new Game(this.getSize());
+        for (int y = 0; y < getSize(); y++) {
+            for (int x = 0; x < getSize(); x++) {
+                clone.tabCases[y][x] = new Case(getCase(x, y).getValue(), clone);
+            }
+        }
+        return clone;
     }
 
 }

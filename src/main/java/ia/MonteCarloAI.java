@@ -18,16 +18,16 @@ public class MonteCarloAI implements AI {
         int games_per_move = 100;
         for (Direction direction : Direction.values()) {
             int won = 0, lost = 0;
+            Game copy;
             for (int i = 0; i < games_per_move; i++) {
-                Game copy;
                 try {
                     copy = (Game) game.clone();
                 } catch (CloneNotSupportedException e) {
                     continue;
                 }
                 copy.move(direction);
-                if (copy.isGameWon())
-                    return direction;
+                // if (copy.isGameWon())
+                //     return direction;
                 if (randomGame(copy))
                     won++;
                 else
