@@ -5,21 +5,33 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Random;
 
-import static java.util.Arrays.asList;
 import static modele.Case.EMPTY_CASE;
+import static java.util.Arrays.asList;
 import static modele.Location.locationAddition;
 
-public class Game extends Observable implements Cloneable {
+public class Game extends Observable {
 
     private Case[][] tabCases;
     public static final Random RANDOM = new Random(10);
 
-    private final List<Location> borders = new ArrayList<>();
+    private static final List<Location> BORDERS = new ArrayList<>();
+    private static Game INSTANCE = null;
 
-    public Game(int size) {
+    private Game(int size) {
         tabCases = new Case[size][size];
         fillGrid();
         generateBorders();
+    }
+
+    public static Game init(int size) {
+        if (INSTANCE == null) {
+            INSTANCE = new Game(size);
+        }
+        return INSTANCE;
+    }
+
+    public static Game getInstance() {
+        return INSTANCE;
     }
 
     private void generateBorders() {
@@ -27,7 +39,7 @@ public class Game extends Observable implements Cloneable {
         for (int y = 0; y < gridSize; y++) {
             for (int x = 0; x < gridSize; x++) {
                 if (x == 0 || y == 0 || x == gridSize - 1 || y == gridSize - 1) {
-                    borders.add(new Location(x, y));
+                    BORDERS.add(new Location(x, y));
                 }
             }
         }
@@ -78,7 +90,7 @@ public class Game extends Observable implements Cloneable {
 
     public boolean isPossibleLocation(Direction direction, Location caseLocation) {
 
-        if (borders.contains(caseLocation)) {
+        if (BORDERS.contains(caseLocation)) {
             switch (direction) {
                 case UP:
                     return caseLocation.getRow() != 0;
@@ -136,7 +148,7 @@ public class Game extends Observable implements Cloneable {
         do {
             location = Location.generateRandomLocation(getSize());
         } while (getCase(location) != EMPTY_CASE);
-        Case caseToAdd = new Case((RANDOM.nextInt(2) + 1) * 2, this);
+        Case caseToAdd = new Case((RANDOM.nextInt(2) + 1) * 2);
         tabCases[location.getRow()][location.getCol()] = caseToAdd;
     }
 
@@ -159,9 +171,9 @@ public class Game extends Observable implements Cloneable {
     }
 
     public boolean isGameWon() {
-        for (int y = 0; y < getSize(); y++) {
-            for (int x = 0; x < getSize(); x++) {
-                if (getCase(x, y).getValue() >= 2048)
+        for(int y = 0; y < getSize(); y++) {
+            for(int x = 0; x < getSize(); x++) {
+                if(getCase(x, y).getValue() >= 2048)
                     return true;
             }
         }
@@ -187,6 +199,7 @@ public class Game extends Observable implements Cloneable {
         notifyObservers();
 
     }
+
 
     public void restart() {
         tabCases = new Case[getSize()][getSize()];
