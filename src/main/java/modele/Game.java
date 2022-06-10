@@ -12,12 +12,14 @@ import static modele.Location.locationAddition;
 public class Game extends Observable implements Cloneable{
 
     private Case[][] tabCases;
+    private int score;
     public static final Random RANDOM = new Random(10);
 
     private static final List<Location> BORDERS = new ArrayList<>();
 
     public Game(int size) {
         tabCases = new Case[size][size];
+        score = 0;
         fillGrid();
         generateBorders();
     }
@@ -183,6 +185,14 @@ public class Game extends Observable implements Cloneable{
             }
         }
         return false;
+    }
+
+    public void addScore(int value) {
+        score += value;
+    }
+    
+    public int getScore() {
+        return score;
     }
 
     public void fillGrid() {

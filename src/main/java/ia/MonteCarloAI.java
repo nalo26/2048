@@ -16,10 +16,10 @@ public class MonteCarloAI implements AI {
     @Override
     public Direction play() {
         Direction best = null;
-        double best_ratio = 0;
+        double best_score_ratio = 0;
         int games_per_move = 100;
         for (Direction direction : Direction.values()) {
-            int won = 0, lost = 0;
+            int score_sum = 0;
             Game copy;
             for (int i = 0; i < games_per_move; i++) {
                 try {
@@ -28,34 +28,30 @@ public class MonteCarloAI implements AI {
                     continue;
                 }
                 copy.move(direction);
-                // if (copy.isGameWon())
-                //     return direction;
-                if (randomGame(copy))
-                    won++;
-                else
-                    lost++;
+                score_sum += randomGame(copy);
             }
-            double ratio = (double) won / (lost + 1);
-            if (ratio > best_ratio || best == null) {
+
+            double ratio = (double) score_sum / games_per_move;
+            if (ratio > best_score_ratio || best == null) {
                 best = direction;
-                best_ratio = ratio;
+                best_score_ratio = ratio;
             }
         }
         return best;
     }
 
-    private boolean randomGame(Game game) {
+    private int randomGame(Game game) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Callable<Boolean> callable = new Callable<Boolean>() {
+        Callable<Integer> callable = new Callable<Integer>() {
             @Override
-            public Boolean call() throws Exception {
+            public Integer call() throws Exception {
                 while (!game.isGameWon() && !game.isGameOver()) {
                     game.move(Direction.randomDirection());
                 }
-                return game.isGameWon();
+                return game.getScore();
             }
         };
-        Future<Boolean> future = executor.submit(callable);
+        Future<Integer> future = executor.submit(callable);
         try {
             return future.get();
         } catch (InterruptedException | ExecutionException e) {

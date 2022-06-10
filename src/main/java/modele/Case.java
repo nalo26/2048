@@ -41,6 +41,7 @@ public class Case {
             as_moved = true;
             neighbour.merge(this);
             game.deleteCase(this);
+            game.addScore(neighbour.getValue());
             neighbour.setMerged(true);
         } 
         return as_moved;
