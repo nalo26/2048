@@ -6,10 +6,10 @@ A simple 2048 Game created with Java using
 
 ## TODO list
 
-[ ] AI  
-    [ ] Implements IA  
-    [ ] Test It  
-[ ] Preferences (Saves)  
-[ ] Death / Win screen  
-[ ] Jmenu  
-[ ] Resizable grid
+- [x] AI  
+    - [ ] Implements IA  
+    - [ ] Test It  
+- [ ] Preferences (Saves)  
+- [ ] Death / Win screen  
+- [ ] Jmenu  
+- [ ] Resizable grid
