@@ -188,11 +188,8 @@ public class Game extends Observable {
                 }
             }
 
-                // generateRandomCase();
-                // generateRandomCase();
-                tabCases[0][0] = new Case(2, this);
-                tabCases[0][1] = new Case(2, this);
-                tabCases[0][3] = new Case(4, this);
+            generateRandomCase();
+            generateRandomCase();
 
         }).start();
 
