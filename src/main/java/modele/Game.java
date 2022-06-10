@@ -71,9 +71,19 @@ public class Game extends Observable {
             }
             if (!isGameOver() && move_count != 0)
                 generateRandomCase();
+
+            resetCellsMergeState();
             setChanged();
             notifyObservers();
         }).start();
+    }
+
+    private void resetCellsMergeState() {
+        for (int y = 0; y < getSize(); y++) {
+            for (int x = 0; x < getSize(); x++) {
+                tabCases[y][x].setMerged(false);
+            }
+        }
     }
 
     public boolean isPossibleLocation(Direction direction, Location caseLocation) {
@@ -178,8 +188,11 @@ public class Game extends Observable {
                 }
             }
 
-            generateRandomCase();
-            generateRandomCase();
+                // generateRandomCase();
+                // generateRandomCase();
+                tabCases[0][0] = new Case(2, this);
+                tabCases[0][1] = new Case(2, this);
+                tabCases[0][3] = new Case(4, this);
 
         }).start();
 
