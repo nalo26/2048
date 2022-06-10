@@ -1,9 +1,12 @@
 package modele;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Arrays.asList;
 import static modele.Case.EMPTY_CASE;
@@ -12,6 +15,7 @@ import static modele.Location.locationAddition;
 public class Game extends Observable implements Cloneable {
 
     private Case[][] tabCases;
+    private Map<Location, Case> posCases = new HashMap<Location, Case>();
     private int score;
     public static final Random RANDOM = new Random(10);
 
@@ -40,38 +44,23 @@ public class Game extends Observable implements Cloneable {
     }
 
     public Case getCase(Location loc) {
-        return tabCases[loc.getRow()][loc.getCol()];
+        return posCases.get(loc);
     }
 
     public Case getCase(int col, int row) {
         return tabCases[row][col];
     }
 
-    public void setCase(Case givenCase, Location loc) throws ArrayIndexOutOfBoundsException {
+    public void setCase(Case givenCase, Location loc) {
         tabCases[loc.getRow()][loc.getCol()] = givenCase;
+        posCases.put(loc, givenCase);
     }
 
     public void move(Direction direction) {
         // new Thread(() -> {
-        int move_count = 0;
-        if (asList(Direction.LEFT, Direction.UP).contains(direction)) {
-            for (int y = 0; y < getSize(); y++) {
-                for (int x = 0; x < getSize(); x++) {
-                    Case currentCase = getCase(x, y);
-                    if (currentCase == EMPTY_CASE) continue;
-                    move_count += currentCase.move(direction) ? 1 : 0;
-                }
-            }
-        } else {
-            for (int y = getSize() - 1; y >= 0; y--) {
-                for (int x = getSize() - 1; x >= 0; x--) {
-                    Case currentCase = getCase(x, y);
-                    if (currentCase == EMPTY_CASE) continue;
-                    move_count += currentCase.move(direction) ? 1 : 0;
-                }
-            }
-        }
-        if (!isGameOver() && move_count != 0)
+        AtomicInteger move_count = new AtomicInteger(0);
+        posCases.values().forEach(currentCase -> move_count.addAndGet(currentCase.move(direction) ? 1 : 0));
+        if (!isGameOver() && move_count.get() != 0)
             generateRandomCase();
 
         resetCellsMergeState();
@@ -81,11 +70,7 @@ public class Game extends Observable implements Cloneable {
     }
 
     private void resetCellsMergeState() {
-        for (int y = 0; y < getSize(); y++) {
-            for (int x = 0; x < getSize(); x++) {
-                tabCases[y][x].setMerged(false);
-            }
-        }
+        posCases.values().forEach(c -> c.setMerged(false));
     }
 
     public boolean isPossibleLocation(Direction direction, Location caseLocation) {
@@ -149,7 +134,7 @@ public class Game extends Observable implements Cloneable {
             location = Location.generateRandomLocation(getSize());
         } while (getCase(location) != EMPTY_CASE);
         Case caseToAdd = new Case((RANDOM.nextInt(2) + 1) * 2, this);
-        tabCases[location.getRow()][location.getCol()] = caseToAdd;
+        setCase(caseToAdd, location);
     }
 
     public boolean isGameOver() {
@@ -193,12 +178,13 @@ public class Game extends Observable implements Cloneable {
     }
 
     public void fillGrid() {
-        // new Thread(() -> { // permet de libérer le processus graphique ou de la console
+        // new Thread(() -> { // permet de libérer le processus graphique ou de la
+        // console
 
         // fill the grid of nothing
         for (int y = 0; y < getSize(); y++) {
             for (int x = 0; x < getSize(); x++) {
-                tabCases[y][x] = EMPTY_CASE;
+                setCase(EMPTY_CASE, new Location(x, y));
             }
         }
 
@@ -210,7 +196,6 @@ public class Game extends Observable implements Cloneable {
         notifyObservers();
 
     }
-
 
     public void restart() {
         tabCases = new Case[getSize()][getSize()];
@@ -227,7 +212,7 @@ public class Game extends Observable implements Cloneable {
         Game clone = new Game(this.getSize());
         for (int y = 0; y < getSize(); y++) {
             for (int x = 0; x < getSize(); x++) {
-                clone.tabCases[y][x] = new Case(getCase(x, y).getValue(), clone);
+                clone.setCase(new Case(getCase(x, y).getValue(), clone), new Location(x, y));
             }
         }
         return clone;
