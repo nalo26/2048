@@ -56,7 +56,7 @@ public class MainMenu extends JPanel {
         add(baseGameClickableLabel);
 
         JLabel iaMode = createJLabelImage(RESOURCE_PATH + "IA_Mode.png", MENU_ITEM_WIDTH, MENU_ITEM_HEIGHT, "IA Mode", Color.GREEN, MENU_ITEM_SIZE);
-        iaMode.addMouseListener(createStandardMouseAdapter(iaMode, null, "IA Mode", "IA Mode hover"));
+        iaMode.addMouseListener(createStandardMouseAdapter(iaMode, new Game2048IAView(game), "IA Mode", "IA Mode hover"));
         iaMode.setHorizontalAlignment(JLabel.CENTER);
         iaMode.setVerticalAlignment(JLabel.CENTER);
         add(iaMode);
