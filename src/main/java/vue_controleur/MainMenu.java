@@ -43,7 +43,7 @@ public class MainMenu extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //setBackground(new Color(51, 51, 51));
+       
         JLabel title = createJLabelImage(RESOURCE_PATH + "2048Title.png", TITLE_WIDTH, TITLE_HEIGHT, TITLE, Color.GREEN, TITLE_SIZE);
         title.setVerticalAlignment(JLabel.NORTH);
         title.setHorizontalAlignment(JLabel.CENTER);
