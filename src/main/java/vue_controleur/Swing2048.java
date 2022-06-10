@@ -3,13 +3,11 @@ package vue_controleur;
 import javax.swing.*;
 import javax.swing.border.Border;
 import modele.Case;
-import modele.Direction;
 import modele.Game;
 
 import static javax.imageio.ImageIO.read;
 import static javax.swing.BorderFactory.createLineBorder;
 import static javax.swing.SwingConstants.CENTER;
-import static javax.swing.SwingConstants.LEFT;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -33,8 +31,8 @@ import static java.util.Arrays.asList;
 import static modele.Case.EMPTY_CASE;
 import static modele.Direction.*;
 
-public class Swing2048 extends JFrame implements Observer {
-    private static final int PIXEL_PER_SQUARE = 150;
+public class Swing2048 extends JPanel implements Observer {
+    public static final int PIXEL_PER_SQUARE = 150;
     // tableau de cases : i, j -> case graphique
     private JLabel[][] tabC;
     private Game game;
@@ -43,11 +41,8 @@ public class Swing2048 extends JFrame implements Observer {
 
     public Swing2048(Game _jeu) {
         game = _jeu;
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize((game.getSize() * PIXEL_PER_SQUARE), (int) ((game.getSize() + 0.5) * PIXEL_PER_SQUARE));
-
-
-        Container mainContent = getContentPane();
+        addKeyListener();
+        Container mainContent = new Container();
         mainContent.setLayout(new BorderLayout());
         Component topComponent = generateTopComponent();
         mainContent.add(topComponent, PAGE_START);
@@ -56,7 +51,7 @@ public class Swing2048 extends JFrame implements Observer {
         caseColor = IntStream.rangeClosed(1, 10).map(val -> (int) pow(2, val)).boxed()
                 .collect(Collectors.toMap(value -> value, value -> colorList.get((int) (log(value) / log(2))).getColor()));
         JPanel contentPanel = new JPanel(new GridLayout(game.getSize(), game.getSize()));
-        contentPanel.setSize(game.getSize() * PIXEL_PER_SQUARE, game.getSize() * PIXEL_PER_SQUARE);
+        contentPanel.setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, game.getSize() * PIXEL_PER_SQUARE));
         Border border = createLineBorder(darkGray, 5);
         for (int i = 0; i < game.getSize(); i++) {
             for (int j = 0; j < game.getSize(); j++) {
@@ -72,8 +67,7 @@ public class Swing2048 extends JFrame implements Observer {
             }
         }
         mainContent.add(contentPanel);
-        setContentPane(mainContent);
-        addKeyListener();
+        add(mainContent);
         refresh();
 
     }
@@ -118,7 +112,7 @@ public class Swing2048 extends JFrame implements Observer {
         endScreen.setOpaque(false);
         endScreen.setForeground(Color.BLACK);
 
-        JLabel endLabel = new JLabel("2048", LEFT);
+        JLabel endLabel = new JLabel("2048", SwingConstants.LEFT);
         endLabel.setFont(new Font(endLabel.getFont().getName(), Font.BOLD, 46));
         endScreen.add(endLabel, BorderLayout.CENTER);
         JLabel restartClickableLabel = new JLabel();
@@ -138,16 +132,19 @@ public class Swing2048 extends JFrame implements Observer {
         return endScreen;
     }
 
+
     /**
      * Correspond à la fonctionnalité de Contrôleur : écoute les évènements, et déclenche des traitements sur le modèle
+     *
+     * @return
      */
-    private void addKeyListener() {
+    public void addKeyListener() {
         addKeyListener(new KeyAdapter() { // new KeyAdapter() { ... } est une instance de classe anonyme, il s'agit d'un objet qui correspond au controleur dans MVC
             @Override
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {  // on regarde quelle touche a été pressée
                     case KeyEvent.VK_LEFT:
-                        game.move(Direction.LEFT);
+                        game.move(LEFT);
                         break;
                     case KeyEvent.VK_RIGHT:
                         game.move(RIGHT);
@@ -162,7 +159,6 @@ public class Swing2048 extends JFrame implements Observer {
             }
         });
     }
-
 
     @Override
     public void update(Observable o, Object arg) {
