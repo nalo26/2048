@@ -31,7 +31,7 @@ public class MainMenu extends JPanel {
     private final Dimension windowDimensions;
 
     public MainMenu() {
-        game = Game.init(4);
+        game = new Game(4);
         windowDimensions = new Dimension(game.getSize() * PIXEL_PER_SQUARE, (int) ((game.getSize() + 0.5) * PIXEL_PER_SQUARE));
         setOpaque(false);
         setLayout(new GridLayout(4, 1));
@@ -43,7 +43,7 @@ public class MainMenu extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-       
+
         JLabel title = createJLabelImage(RESOURCE_PATH + "2048Title.png", TITLE_WIDTH, TITLE_HEIGHT, TITLE, Color.GREEN, TITLE_SIZE);
         title.setVerticalAlignment(JLabel.NORTH);
         title.setHorizontalAlignment(JLabel.CENTER);

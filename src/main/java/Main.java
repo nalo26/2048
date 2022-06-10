@@ -1,6 +1,12 @@
+import javax.swing.*;
 import modele.Game;
 import vue_controleur.Console2048;
-import vue_controleur.Swing2048;
+import vue_controleur.MainMenu;
+
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import java.awt.*;
+
+import static vue_controleur.Swing2048.PIXEL_PER_SQUARE;
 
 public class Main {
 
@@ -11,7 +17,7 @@ public class Main {
     }
 
     public static void mainConsole() {
-        Game jeu = Game.init(4);
+        Game jeu = new Game(4);
         Console2048 vue = new Console2048(jeu);
         jeu.addObserver(vue);
 
@@ -20,7 +26,7 @@ public class Main {
     }
 
     public static void mainSwing() {
-        Game game = Game.init(4);
+        Game game = new Game(4);
         JFrame mainFrame = new JFrame();
         mainFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         mainFrame.setResizable(false);
