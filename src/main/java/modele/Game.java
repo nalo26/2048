@@ -9,7 +9,7 @@ import static java.util.Arrays.asList;
 import static modele.Case.EMPTY_CASE;
 import static modele.Location.locationAddition;
 
-public class Game extends Observable implements Cloneable{
+public class Game extends Observable implements Cloneable {
 
     private Case[][] tabCases;
     private int score;
@@ -53,30 +53,30 @@ public class Game extends Observable implements Cloneable{
 
     public void move(Direction direction) {
         // new Thread(() -> {
-            int move_count = 0;
-            if (asList(Direction.LEFT, Direction.UP).contains(direction)) {
-                for (int y = 0; y < getSize(); y++) {
-                    for (int x = 0; x < getSize(); x++) {
-                        Case currentCase = getCase(x, y);
-                        if (currentCase == EMPTY_CASE) continue;
-                        move_count += currentCase.move(direction) ? 1 : 0;
-                    }
-                }
-            } else {
-                for (int y = getSize() - 1; y >= 0; y--) {
-                    for (int x = getSize() - 1; x >= 0; x--) {
-                        Case currentCase = getCase(x, y);
-                        if (currentCase == EMPTY_CASE) continue;
-                        move_count += currentCase.move(direction) ? 1 : 0;
-                    }
+        int move_count = 0;
+        if (asList(Direction.LEFT, Direction.UP).contains(direction)) {
+            for (int y = 0; y < getSize(); y++) {
+                for (int x = 0; x < getSize(); x++) {
+                    Case currentCase = getCase(x, y);
+                    if (currentCase == EMPTY_CASE) continue;
+                    move_count += currentCase.move(direction) ? 1 : 0;
                 }
             }
-            if (!isGameOver() && move_count != 0)
-                generateRandomCase();
+        } else {
+            for (int y = getSize() - 1; y >= 0; y--) {
+                for (int x = getSize() - 1; x >= 0; x--) {
+                    Case currentCase = getCase(x, y);
+                    if (currentCase == EMPTY_CASE) continue;
+                    move_count += currentCase.move(direction) ? 1 : 0;
+                }
+            }
+        }
+        if (!isGameOver() && move_count != 0)
+            generateRandomCase();
 
-            resetCellsMergeState();
-            setChanged();
-            notifyObservers();
+        resetCellsMergeState();
+        setChanged();
+        notifyObservers();
         // }).start();
     }
 
@@ -116,12 +116,8 @@ public class Game extends Observable implements Cloneable{
             Location locationToAdd = direction.getLocation();
             Location oldLocation = getCaseLocation(currentCase);
             Location newLocation = locationAddition(locationToAdd, oldLocation);
-            try {
-                setCase(currentCase, newLocation);
-                setCase(EMPTY_CASE, oldLocation);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                System.out.println("Oopsi woopsi, I did oopsi daddy!");
-            }
+            setCase(currentCase, newLocation);
+            setCase(EMPTY_CASE, oldLocation);
             return true;
         }
         return false;
@@ -129,9 +125,6 @@ public class Game extends Observable implements Cloneable{
 
     public Case getNeighbour(Direction direction, Case givenCase) {
         Location caseLocation = getCaseLocation(givenCase);
-        if(caseLocation == null){
-            System.out.println("caseLocation is null");
-        }
         if (isPossibleLocation(direction, caseLocation)) {
             Location locationToAdd = direction.getLocation();
             return getCase(locationAddition(locationToAdd, caseLocation));
@@ -161,16 +154,20 @@ public class Game extends Observable implements Cloneable{
 
     public boolean isGameOver() {
         Case currentCase, neighbour;
+        List<Case> notEmptyCases = new ArrayList<>();
         for (int y = 0; y < getSize(); y++) {
             for (int x = 0; x < getSize(); x++) {
                 currentCase = getCase(x, y);
                 if (currentCase == EMPTY_CASE)
                     return false;
-                for (Direction direction : Direction.values()) {
-                    neighbour = getNeighbour(direction, currentCase);
-                    if (neighbour != null && neighbour.getValue() == currentCase.getValue()) {
-                        return false;
-                    }
+                notEmptyCases.add(currentCase);
+            }
+        }
+        for (Direction direction : Direction.values()) {
+            for (Case currentNotEmptyCase : notEmptyCases) {
+                neighbour = getNeighbour(direction, currentNotEmptyCase);
+                if (neighbour != null && neighbour.getValue() == currentNotEmptyCase.getValue()) {
+                    return false;
                 }
             }
         }
@@ -190,7 +187,7 @@ public class Game extends Observable implements Cloneable{
     public void addScore(int value) {
         score += value;
     }
-    
+
     public int getScore() {
         return score;
     }
@@ -198,15 +195,15 @@ public class Game extends Observable implements Cloneable{
     public void fillGrid() {
         // new Thread(() -> { // permet de libérer le processus graphique ou de la console
 
-            // fill the grid of nothing
-            for (int y = 0; y < getSize(); y++) {
-                for (int x = 0; x < getSize(); x++) {
-                    tabCases[y][x] = EMPTY_CASE;
-                }
+        // fill the grid of nothing
+        for (int y = 0; y < getSize(); y++) {
+            for (int x = 0; x < getSize(); x++) {
+                tabCases[y][x] = EMPTY_CASE;
             }
+        }
 
-            generateRandomCase();
-            generateRandomCase();
+        generateRandomCase();
+        generateRandomCase();
         // }).start();
 
         setChanged();
@@ -217,6 +214,7 @@ public class Game extends Observable implements Cloneable{
 
     public void restart() {
         tabCases = new Case[getSize()][getSize()];
+        score = 0;
         fillGrid();
         generateBorders();
         setChanged();

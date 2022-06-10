@@ -3,7 +3,10 @@ package ia;
 import modele.Direction;
 import modele.Game;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class MonteCarloAI implements AI {
 
@@ -42,16 +45,12 @@ public class MonteCarloAI implements AI {
 
     private int randomGame(Game game) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Callable<Integer> callable = new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                while (!game.isGameWon() && !game.isGameOver()) {
-                    game.move(Direction.randomDirection());
-                }
-                return game.getScore();
+        Future<Integer> future = executor.submit(() -> {
+            while (!game.isGameWon() && !game.isGameOver()) {
+                game.move(Direction.randomDirection());
             }
-        };
-        Future<Integer> future = executor.submit(callable);
+            return game.getScore();
+        });
         try {
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
