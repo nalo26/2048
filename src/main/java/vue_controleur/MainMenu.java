@@ -28,12 +28,14 @@ public class MainMenu extends JPanel {
     public static final int MENU_ITEM_SIZE = 32;
     private final Game game;
     private final Map<String, BufferedImage> menuImages = new HashMap<>();
+    private final Dimension windowDimensions;
 
     public MainMenu() {
         game = Game.init(4);
+        windowDimensions = new Dimension(game.getSize() * PIXEL_PER_SQUARE, (int) ((game.getSize() + 0.5) * PIXEL_PER_SQUARE));
         setOpaque(false);
         setLayout(new GridLayout(4, 1));
-        setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, (int) ((game.getSize() + 0.5) * PIXEL_PER_SQUARE)));
+        setPreferredSize(windowDimensions);
         try {
             menuImages.put("base game hover", read(new File(RESOURCE_PATH + "base_game_hover.png")));
             menuImages.put("IA Mode hover", read(new File(RESOURCE_PATH + "IA_Mode_hover.png")));
