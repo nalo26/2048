@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Random;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Arrays.asList;
@@ -59,7 +60,7 @@ public class Game extends Observable implements Cloneable {
     public void move(Direction direction) {
         // new Thread(() -> {
         AtomicInteger move_count = new AtomicInteger(0);
-        posCases.values().forEach(currentCase -> move_count.addAndGet(currentCase.move(direction) ? 1 : 0));
+        posCases.values().stream().filter(currentCase -> currentCase != Case.EMPTY_CASE).forEach(currentCase -> move_count.addAndGet(currentCase.move(direction) ? 1 : 0));
         if (!isGameOver() && move_count.get() != 0)
             generateRandomCase();
 
@@ -118,11 +119,9 @@ public class Game extends Observable implements Cloneable {
     }
 
     public Location getCaseLocation(Case givenCase) {
-        for (int y = 0; y < getSize(); y++) {
-            for (int x = 0; x < getSize(); x++) {
-                if (givenCase == getCase(x, y)) {
-                    return new Location(x, y);
-                }
+        for (Entry<Location, Case> entry : posCases.entrySet()) {
+            if (entry.getValue() == givenCase) {
+                return entry.getKey();
             }
         }
         return null;
@@ -140,13 +139,11 @@ public class Game extends Observable implements Cloneable {
     public boolean isGameOver() {
         Case currentCase, neighbour;
         List<Case> notEmptyCases = new ArrayList<>();
-        for (int y = 0; y < getSize(); y++) {
-            for (int x = 0; x < getSize(); x++) {
-                currentCase = getCase(x, y);
-                if (currentCase == EMPTY_CASE)
-                    return false;
-                notEmptyCases.add(currentCase);
-            }
+        for (Entry<Location, Case> entry : posCases.entrySet()) {
+            currentCase = entry.getValue();
+            if (currentCase == EMPTY_CASE)
+                return false;
+            notEmptyCases.add(currentCase);
         }
         for (Direction direction : Direction.values()) {
             for (Case currentNotEmptyCase : notEmptyCases) {
@@ -160,11 +157,9 @@ public class Game extends Observable implements Cloneable {
     }
 
     public boolean isGameWon() {
-        for (int y = 0; y < getSize(); y++) {
-            for (int x = 0; x < getSize(); x++) {
-                if (getCase(x, y).getValue() >= 2048)
-                    return true;
-            }
+        for (Entry<Location, Case> entry : posCases.entrySet()) {
+            if (entry.getValue().getValue() >= 2048)
+                return true;
         }
         return false;
     }
@@ -210,10 +205,8 @@ public class Game extends Observable implements Cloneable {
     public Object clone() throws CloneNotSupportedException {
         // return super.clone();
         Game clone = new Game(this.getSize());
-        for (int y = 0; y < getSize(); y++) {
-            for (int x = 0; x < getSize(); x++) {
-                clone.setCase(new Case(getCase(x, y).getValue(), clone), new Location(x, y));
-            }
+        for (Entry<Location, Case> entry : posCases.entrySet()) {
+            clone.setCase(new Case(entry.getValue().getValue(), clone), entry.getKey());
         }
         return clone;
     }
