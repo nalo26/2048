@@ -27,12 +27,6 @@ public class Main {
 
     public static void mainSwing() {
         Game game = Game.init(4);
-
-        /*Swing2048 vue = new Swing2048(jeu);
-        vue.setResizable(false);
-        jeu.addObserver(vue);
-
-        vue.setVisible(true);*/
         JFrame mainFrame = new JFrame();
         mainFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         mainFrame.setResizable(false);
