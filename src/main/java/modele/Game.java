@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Random;
 
-import static modele.Case.EMPTY_CASE;
 import static java.util.Arrays.asList;
+import static modele.Case.EMPTY_CASE;
 import static modele.Location.locationAddition;
 
 public class Game extends Observable {
@@ -15,23 +15,11 @@ public class Game extends Observable {
     public static final Random RANDOM = new Random(10);
 
     private static final List<Location> BORDERS = new ArrayList<>();
-    private static Game INSTANCE = null;
 
-    private Game(int size) {
+    public Game(int size) {
         tabCases = new Case[size][size];
         fillGrid();
         generateBorders();
-    }
-
-    public static Game init(int size) {
-        if (INSTANCE == null) {
-            INSTANCE = new Game(size);
-        }
-        return INSTANCE;
-    }
-
-    public static Game getInstance() {
-        return INSTANCE;
     }
 
     private void generateBorders() {
@@ -148,7 +136,7 @@ public class Game extends Observable {
         do {
             location = Location.generateRandomLocation(getSize());
         } while (getCase(location) != EMPTY_CASE);
-        Case caseToAdd = new Case((RANDOM.nextInt(2) + 1) * 2);
+        Case caseToAdd = new Case((RANDOM.nextInt(2) + 1) * 2, this);
         tabCases[location.getRow()][location.getCol()] = caseToAdd;
     }
 
@@ -171,9 +159,9 @@ public class Game extends Observable {
     }
 
     public boolean isGameWon() {
-        for(int y = 0; y < getSize(); y++) {
-            for(int x = 0; x < getSize(); x++) {
-                if(getCase(x, y).getValue() >= 2048)
+        for (int y = 0; y < getSize(); y++) {
+            for (int x = 0; x < getSize(); x++) {
+                if (getCase(x, y).getValue() >= 2048)
                     return true;
             }
         }
