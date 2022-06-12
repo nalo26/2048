@@ -1,13 +1,9 @@
 package modele;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Random;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static modele.Case.EMPTY_CASE;
@@ -60,7 +56,9 @@ public class Game extends Observable implements Cloneable {
     public void move(Direction direction) {
         // new Thread(() -> {
         AtomicInteger move_count = new AtomicInteger(0);
-        posCases.values().stream().filter(currentCase -> currentCase != Case.EMPTY_CASE).forEach(currentCase -> move_count.addAndGet(currentCase.move(direction) ? 1 : 0));
+       List<Integer> cases =  posCases.values().stream().filter(currentCase -> currentCase != Case.EMPTY_CASE).map(currentCase -> move_count.addAndGet(currentCase.move(direction) ? 1 : 0)).collect(Collectors.toList());
+             //   .forEach(currentCase -> move_count.addAndGet(currentCase.move(direction) ? 1 : 0));
+
         if (!isGameOver() && move_count.get() != 0)
             generateRandomCase();
 
@@ -119,12 +117,14 @@ public class Game extends Observable implements Cloneable {
     }
 
     public Location getCaseLocation(Case givenCase) {
-        for (Entry<Location, Case> entry : posCases.entrySet()) {
-            if (entry.getValue() == givenCase) {
-                return entry.getKey();
-            }
-        }
-        return null;
+//        for (Entry<Location, Case> entry : posCases.entrySet()) {
+//            if (entry.getValue() == givenCase) {
+//                return entry.getKey();
+//            }
+//        }
+//        return null;
+        final Optional<Location> currentLocation = posCases.entrySet().stream().filter(enty -> givenCase.equals(enty.getValue())).map(Entry::getKey).findFirst();
+        return currentLocation.orElseThrow(() -> new RuntimeException("Cannot find location"));
     }
 
     public void generateRandomCase() {
