@@ -31,7 +31,7 @@ public class MainMenu extends JPanel {
     private final Dimension windowDimensions;
 
     public MainMenu() {
-        game = Game.init(4);
+        game = new Game(4);
         windowDimensions = new Dimension(game.getSize() * PIXEL_PER_SQUARE, (int) ((game.getSize() + 0.5) * PIXEL_PER_SQUARE));
         setOpaque(false);
         setLayout(new GridLayout(4, 1));
@@ -43,7 +43,7 @@ public class MainMenu extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-       
+
         JLabel title = createJLabelImage(RESOURCE_PATH + "2048Title.png", TITLE_WIDTH, TITLE_HEIGHT, TITLE, Color.GREEN, TITLE_SIZE);
         title.setVerticalAlignment(JLabel.NORTH);
         title.setHorizontalAlignment(JLabel.CENTER);
@@ -56,7 +56,7 @@ public class MainMenu extends JPanel {
         add(baseGameClickableLabel);
 
         JLabel iaMode = createJLabelImage(RESOURCE_PATH + "IA_Mode.png", MENU_ITEM_WIDTH, MENU_ITEM_HEIGHT, "IA Mode", Color.GREEN, MENU_ITEM_SIZE);
-        iaMode.addMouseListener(createStandardMouseAdapter(iaMode, null, "IA Mode", "IA Mode hover"));
+        iaMode.addMouseListener(createStandardMouseAdapter(iaMode, new Game2048IAView(game), "IA Mode", "IA Mode hover"));
         iaMode.setHorizontalAlignment(JLabel.CENTER);
         iaMode.setVerticalAlignment(JLabel.CENTER);
         add(iaMode);

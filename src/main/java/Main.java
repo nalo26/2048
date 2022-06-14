@@ -14,10 +14,11 @@ public class Main {
         //mainConsole();
         System.setProperty("java2d.uiScale", "2.5");
         mainSwing();
+
     }
 
     public static void mainConsole() {
-        Game jeu = Game.init(4);
+        Game jeu = new Game(4);
         Console2048 vue = new Console2048(jeu);
         jeu.addObserver(vue);
 
@@ -26,7 +27,7 @@ public class Main {
     }
 
     public static void mainSwing() {
-        Game game = Game.init(4);
+        Game game = new Game(4);
         JFrame mainFrame = new JFrame();
         mainFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         mainFrame.setResizable(false);

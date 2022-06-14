@@ -1,37 +1,27 @@
 package modele;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Random;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static modele.Case.EMPTY_CASE;
-import static java.util.Arrays.asList;
 import static modele.Location.locationAddition;
 
-public class Game extends Observable {
+public class Game extends Observable implements Cloneable {
 
     private Case[][] tabCases;
+    private Map<Location, Case> posCases = new HashMap<Location, Case>();
+    private int score;
     public static final Random RANDOM = new Random(10);
 
     private static final List<Location> BORDERS = new ArrayList<>();
-    private static Game INSTANCE = null;
 
-    private Game(int size) {
+    public Game(int size) {
         tabCases = new Case[size][size];
+        score = 0;
         fillGrid();
         generateBorders();
-    }
-
-    public static Game init(int size) {
-        if (INSTANCE == null) {
-            INSTANCE = new Game(size);
-        }
-        return INSTANCE;
-    }
-
-    public static Game getInstance() {
-        return INSTANCE;
     }
 
     private void generateBorders() {
@@ -50,7 +40,7 @@ public class Game extends Observable {
     }
 
     public Case getCase(Location loc) {
-        return tabCases[loc.getRow()][loc.getCol()];
+        return posCases.get(loc);
     }
 
     public Case getCase(int col, int row) {
@@ -59,33 +49,25 @@ public class Game extends Observable {
 
     public void setCase(Case givenCase, Location loc) {
         tabCases[loc.getRow()][loc.getCol()] = givenCase;
+        posCases.put(loc, givenCase);
     }
 
     public void move(Direction direction) {
-        new Thread(() -> {
-            int move_count = 0;
-            if (asList(Direction.LEFT, Direction.UP).contains(direction)) {
-                for (int y = 0; y < getSize(); y++) {
-                    for (int x = 0; x < getSize(); x++) {
-                        Case currentCase = getCase(x, y);
-                        if (currentCase == EMPTY_CASE) continue;
-                        move_count += currentCase.move(direction) ? 1 : 0;
-                    }
-                }
-            } else {
-                for (int y = getSize() - 1; y >= 0; y--) {
-                    for (int x = getSize() - 1; x >= 0; x--) {
-                        Case currentCase = getCase(x, y);
-                        if (currentCase == EMPTY_CASE) continue;
-                        move_count += currentCase.move(direction) ? 1 : 0;
-                    }
-                }
-            }
-            if (!isGameOver() && move_count != 0)
-                generateRandomCase();
-            setChanged();
-            notifyObservers();
-        }).start();
+        AtomicInteger move_count = new AtomicInteger(0);
+        List<Integer> cases = posCases.values().stream().filter(currentCase -> currentCase != Case.EMPTY_CASE)
+                .map(currentCase -> move_count.addAndGet(currentCase.move(direction) ? 1 : 0))
+                .collect(Collectors.toList());
+
+        if (!isGameOver() && move_count.get() != 0)
+            generateRandomCase();
+
+        resetCellsMergeState();
+        setChanged();
+        notifyObservers();
+    }
+
+    private void resetCellsMergeState() {
+        posCases.values().forEach(c -> c.setMerged(false));
     }
 
     public boolean isPossibleLocation(Direction direction, Location caseLocation) {
@@ -133,14 +115,9 @@ public class Game extends Observable {
     }
 
     public Location getCaseLocation(Case givenCase) {
-        for (int y = 0; y < getSize(); y++) {
-            for (int x = 0; x < getSize(); x++) {
-                if (givenCase == getCase(x, y)) {
-                    return new Location(x, y);
-                }
-            }
-        }
-        return null;
+        final Optional<Location> currentLocation = posCases.entrySet().stream()
+                .filter(enty -> givenCase.equals(enty.getValue())).map(Entry::getKey).findFirst();
+        return currentLocation.orElseThrow(() -> new RuntimeException("Cannot find location"));
     }
 
     public void generateRandomCase() {
@@ -148,54 +125,77 @@ public class Game extends Observable {
         do {
             location = Location.generateRandomLocation(getSize());
         } while (getCase(location) != EMPTY_CASE);
-        Case caseToAdd = new Case((RANDOM.nextInt(2) + 1) * 2);
-        tabCases[location.getRow()][location.getCol()] = caseToAdd;
+        Case caseToAdd = new Case((RANDOM.nextInt(2) + 1) * 2, this);
+        setCase(caseToAdd, location);
     }
 
     public boolean isGameOver() {
         Case currentCase, neighbour;
-        for (int y = 0; y < getSize(); y++) {
-            for (int x = 0; x < getSize(); x++) {
-                currentCase = getCase(x, y);
-                if (currentCase == EMPTY_CASE)
+        List<Case> notEmptyCases = new ArrayList<>();
+        for (Entry<Location, Case> entry : posCases.entrySet()) {
+            currentCase = entry.getValue();
+            if (currentCase == EMPTY_CASE)
+                return false;
+            notEmptyCases.add(currentCase);
+        }
+        for (Direction direction : Direction.values()) {
+            for (Case currentNotEmptyCase : notEmptyCases) {
+                neighbour = getNeighbour(direction, currentNotEmptyCase);
+                if (neighbour != null && neighbour.getValue() == currentNotEmptyCase.getValue()) {
                     return false;
-                for (Direction direction : Direction.values()) {
-                    neighbour = getNeighbour(direction, currentCase);
-                    if (neighbour != null && neighbour.getValue() == currentCase.getValue()) {
-                        return false;
-                    }
                 }
             }
         }
         return true;
     }
 
+    public boolean isGameWon() {
+        for (Entry<Location, Case> entry : posCases.entrySet()) {
+            if (entry.getValue().getValue() >= 2048)
+                return true;
+        }
+        return false;
+    }
+
+    public void addScore(int value) {
+        score += value;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
     public void fillGrid() {
-        new Thread(() -> { // permet de libérer le processus graphique ou de la console
-
-            // fill the grid of nothing
-            for (int y = 0; y < getSize(); y++) {
-                for (int x = 0; x < getSize(); x++) {
-                    tabCases[y][x] = EMPTY_CASE;
-                }
+        // fill the grid of nothing
+        for (int y = 0; y < getSize(); y++) {
+            for (int x = 0; x < getSize(); x++) {
+                setCase(EMPTY_CASE, new Location(x, y));
             }
+        }
 
-            generateRandomCase();
-            generateRandomCase();
-
-        }).start();
+        generateRandomCase();
+        generateRandomCase();
 
         setChanged();
         notifyObservers();
-
     }
-
 
     public void restart() {
         tabCases = new Case[getSize()][getSize()];
+        score = 0;
         fillGrid();
         generateBorders();
         setChanged();
         notifyObservers();
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        Game clone = new Game(this.getSize());
+        for (Entry<Location, Case> entry : posCases.entrySet()) {
+            clone.setCase(new Case(entry.getValue().getValue(), clone), entry.getKey());
+        }
+        return clone;
+    }
+
 }

@@ -1,14 +1,20 @@
 package modele;
 
-import static modele.Game.getInstance;
-
 public class Case {
     public static final Case EMPTY_CASE = new Case(-1);
 
     private int value;
+    private Game game;
+    private boolean is_merged;
 
     public Case(int value) {
         this.value = value;
+        this.is_merged = false;
+    }
+
+    public Case(int value, Game game) {
+        this(value);
+        this.game = game;
     }
 
     public int getValue() {
@@ -20,7 +26,6 @@ public class Case {
     }
 
     public Boolean move(Direction direction) {
-        Game game = getInstance();
         Boolean as_moved = false;
 
         Case neighbour = game.getNeighbour(direction, this);
@@ -32,12 +37,18 @@ public class Case {
             neighbour = game.getNeighbour(direction, this);
         }
         if (neighbour == null) return as_moved;
-        if (neighbour.getValue() == this.value){
+        if (neighbour.getValue() == this.value && !neighbour.is_merged){
             as_moved = true;
             neighbour.merge(this);
             game.deleteCase(this);
+            if(neighbour.getValue() > 0) game.addScore(neighbour.getValue());
+            neighbour.setMerged(true);
         } 
         return as_moved;
+    }
+
+    public void setMerged(boolean state) {
+        this.is_merged = state;
     }
 
 }

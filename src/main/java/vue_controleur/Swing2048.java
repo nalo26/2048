@@ -34,10 +34,10 @@ import static modele.Direction.*;
 public class Swing2048 extends JPanel implements Observer {
     public static final int PIXEL_PER_SQUARE = 150;
     // tableau de cases : i, j -> case graphique
-    private JLabel[][] tabC;
-    private Game game;
-    private final Map<Integer, Color> caseColor;
-    private final List<CaseColors> colorList = asList(CaseColors.values());
+    protected JLabel[][] tabC;
+    protected Game game;
+    protected final Map<Integer, Color> caseColor;
+    protected final List<CaseColors> colorList = asList(CaseColors.values());
 
     public Swing2048(Game _jeu) {
         game = _jeu;
@@ -50,6 +50,14 @@ public class Swing2048 extends JPanel implements Observer {
         tabC = new JLabel[game.getSize()][game.getSize()];
         caseColor = IntStream.rangeClosed(1, 10).map(val -> (int) pow(2, val)).boxed()
                 .collect(Collectors.toMap(value -> value, value -> colorList.get((int) (log(value) / log(2))).getColor()));
+        JPanel contentPanel = getGameContentPanel();
+        mainContent.add(contentPanel);
+        add(mainContent);
+        refresh();
+
+    }
+
+    protected JPanel getGameContentPanel() {
         JPanel contentPanel = new JPanel(new GridLayout(game.getSize(), game.getSize()));
         contentPanel.setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, game.getSize() * PIXEL_PER_SQUARE));
         Border border = createLineBorder(darkGray, 5);
@@ -66,10 +74,7 @@ public class Swing2048 extends JPanel implements Observer {
 
             }
         }
-        mainContent.add(contentPanel);
-        add(mainContent);
-        refresh();
-
+        return contentPanel;
     }
 
 
@@ -77,7 +82,7 @@ public class Swing2048 extends JPanel implements Observer {
      * Correspond à la fonctionnalité de Vue : affiche les données du modèle
      * 🤡🤡🤡
      */
-    private void refresh() {
+    protected void refresh() {
 
         // demande au processus graphique de réaliser le traitement
         SwingUtilities.invokeLater(() -> {
@@ -112,7 +117,7 @@ public class Swing2048 extends JPanel implements Observer {
         endScreen.setOpaque(false);
         endScreen.setForeground(Color.BLACK);
 
-        JLabel endLabel = new JLabel("2048", SwingConstants.LEFT);
+        JLabel endLabel = new JLabel("2048 - Score : " + game.getScore(), SwingConstants.LEFT);
         endLabel.setFont(new Font(endLabel.getFont().getName(), Font.BOLD, 46));
         endScreen.add(endLabel, BorderLayout.CENTER);
         JLabel restartClickableLabel = new JLabel();
@@ -135,8 +140,6 @@ public class Swing2048 extends JPanel implements Observer {
 
     /**
      * Correspond à la fonctionnalité de Contrôleur : écoute les évènements, et déclenche des traitements sur le modèle
-     *
-     * @return
      */
     public void addKeyListener() {
         addKeyListener(new KeyAdapter() { // new KeyAdapter() { ... } est une instance de classe anonyme, il s'agit d'un objet qui correspond au controleur dans MVC
