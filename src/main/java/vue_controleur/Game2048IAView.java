@@ -36,7 +36,6 @@ public class Game2048IAView extends Swing2048 {
             Direction play = ai.play();
             System.out.println("dir : " + play);
             _jeu.move(play);
-            //System.out.println("over : " + _jeu.isGameOver() + " won : " + _jeu.isGameWon());
             refresh();
 
         }

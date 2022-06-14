@@ -20,17 +20,17 @@ public class MonteCarloAI implements AI {
     public Direction play() {
         Direction best = null;
         double best_score_ratio = 0;
-        int games_per_move = 100;
+        int games_per_move = 500;
         for (Direction direction : Direction.values()) {
             int score_sum = 0;
             Game copy;
-            for (int i = 0; i < games_per_move; i++) {
-                try {
-                    copy = (Game) game.clone();
-                } catch (CloneNotSupportedException e) {
-                    continue;
-                }
-                copy.move(direction);
+            try {
+                copy = (Game) game.clone();
+            } catch (CloneNotSupportedException e) {
+                continue;
+            }
+            copy.move(direction);
+            for (int i = 0; i < games_per_move; i++) {   
                 score_sum += randomGame(copy);
             }
 

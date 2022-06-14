@@ -117,7 +117,7 @@ public class Swing2048 extends JPanel implements Observer {
         endScreen.setOpaque(false);
         endScreen.setForeground(Color.BLACK);
 
-        JLabel endLabel = new JLabel("2048", SwingConstants.LEFT);
+        JLabel endLabel = new JLabel("2048 - Score : " + game.getScore(), SwingConstants.LEFT);
         endLabel.setFont(new Font(endLabel.getFont().getName(), Font.BOLD, 46));
         endScreen.add(endLabel, BorderLayout.CENTER);
         JLabel restartClickableLabel = new JLabel();

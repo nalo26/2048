@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.asList;
 import static modele.Case.EMPTY_CASE;
 import static modele.Location.locationAddition;
 
@@ -54,10 +53,10 @@ public class Game extends Observable implements Cloneable {
     }
 
     public void move(Direction direction) {
-        // new Thread(() -> {
         AtomicInteger move_count = new AtomicInteger(0);
-       List<Integer> cases =  posCases.values().stream().filter(currentCase -> currentCase != Case.EMPTY_CASE).map(currentCase -> move_count.addAndGet(currentCase.move(direction) ? 1 : 0)).collect(Collectors.toList());
-             //   .forEach(currentCase -> move_count.addAndGet(currentCase.move(direction) ? 1 : 0));
+        List<Integer> cases = posCases.values().stream().filter(currentCase -> currentCase != Case.EMPTY_CASE)
+                .map(currentCase -> move_count.addAndGet(currentCase.move(direction) ? 1 : 0))
+                .collect(Collectors.toList());
 
         if (!isGameOver() && move_count.get() != 0)
             generateRandomCase();
@@ -65,7 +64,6 @@ public class Game extends Observable implements Cloneable {
         resetCellsMergeState();
         setChanged();
         notifyObservers();
-        // }).start();
     }
 
     private void resetCellsMergeState() {
@@ -117,13 +115,8 @@ public class Game extends Observable implements Cloneable {
     }
 
     public Location getCaseLocation(Case givenCase) {
-//        for (Entry<Location, Case> entry : posCases.entrySet()) {
-//            if (entry.getValue() == givenCase) {
-//                return entry.getKey();
-//            }
-//        }
-//        return null;
-        final Optional<Location> currentLocation = posCases.entrySet().stream().filter(enty -> givenCase.equals(enty.getValue())).map(Entry::getKey).findFirst();
+        final Optional<Location> currentLocation = posCases.entrySet().stream()
+                .filter(enty -> givenCase.equals(enty.getValue())).map(Entry::getKey).findFirst();
         return currentLocation.orElseThrow(() -> new RuntimeException("Cannot find location"));
     }
 
@@ -173,9 +166,6 @@ public class Game extends Observable implements Cloneable {
     }
 
     public void fillGrid() {
-        // new Thread(() -> { // permet de libérer le processus graphique ou de la
-        // console
-
         // fill the grid of nothing
         for (int y = 0; y < getSize(); y++) {
             for (int x = 0; x < getSize(); x++) {
@@ -185,11 +175,9 @@ public class Game extends Observable implements Cloneable {
 
         generateRandomCase();
         generateRandomCase();
-        // }).start();
 
         setChanged();
         notifyObservers();
-
     }
 
     public void restart() {
@@ -203,7 +191,6 @@ public class Game extends Observable implements Cloneable {
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        // return super.clone();
         Game clone = new Game(this.getSize());
         for (Entry<Location, Case> entry : posCases.entrySet()) {
             clone.setCase(new Case(entry.getValue().getValue(), clone), entry.getKey());
