@@ -1,7 +1,6 @@
 package vue_controleur;
 
 import javax.swing.*;
-import modele.Game;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -12,9 +11,9 @@ import static vue_controleur.Swing2048.PIXEL_PER_SQUARE;
 
 public class EndScreen extends JPanel {
 
-    public EndScreen(Game game, String text) {
+    public EndScreen(Swing2048 view, String text) {
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, game.getSize() * PIXEL_PER_SQUARE + PIXEL_PER_SQUARE / 2));
+        setPreferredSize(view.getGameContentSize());
         setBackground(new Color(100, 100, 100, 100));
         JLabel endLabel = new JLabel(text);
         Font font = new Font("serif", Font.PLAIN, 40);
@@ -27,11 +26,10 @@ public class EndScreen extends JPanel {
         restart.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                game.restart();
-                removeAll();
-                Swing2048 swing2048 = new Swing2048(game);
-                add(swing2048);
-                swing2048.requestFocusInWindow();
+                view.restartGame();
+                Container container = view.getMainContent();
+                container.remove(EndScreen.this);
+                container.add(view.getContentPanel());
                 updateUI();
             }
         });
