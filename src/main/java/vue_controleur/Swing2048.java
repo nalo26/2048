@@ -102,8 +102,14 @@ public class Swing2048 extends JPanel implements Observer {
 
                 }
             }
-            if (game.isGameOver()) {
-                generateTopComponent();
+            if (game.isGameOver() || game.isGameWon()) {
+                EndScreen endScreen = new EndScreen(game, game.isGameOver() ? "YOU LOSE 🤡🤡 !" : "YOU WIN 👑👑!");
+                endScreen.setVisible(true);
+                removeAll();
+                add(endScreen);
+                endScreen.requestFocusInWindow();
+                System.out.println("ici");
+                updateUI();
             }
         });
 
@@ -111,15 +117,15 @@ public class Swing2048 extends JPanel implements Observer {
     }
 
     private Component generateTopComponent() {
-        JPanel endScreen = new JPanel(new BorderLayout(game.getSize(), game.getSize()));
-        endScreen.setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, PIXEL_PER_SQUARE / 2));
-        endScreen.setBackground(Color.BLACK);
-        endScreen.setOpaque(false);
-        endScreen.setForeground(Color.BLACK);
+        JPanel topPanel = new JPanel(new BorderLayout(game.getSize(), game.getSize()));
+        topPanel.setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, PIXEL_PER_SQUARE / 2));
+        topPanel.setBackground(Color.BLACK);
+        topPanel.setOpaque(false);
+        topPanel.setForeground(Color.BLACK);
 
-        JLabel endLabel = new JLabel("2048 - Score : " + game.getScore(), SwingConstants.LEFT);
-        endLabel.setFont(new Font(endLabel.getFont().getName(), Font.BOLD, 46));
-        endScreen.add(endLabel, BorderLayout.CENTER);
+        JLabel title = new JLabel("2048 - Score : " + game.getScore(), SwingConstants.LEFT);
+        title.setFont(new Font(title.getFont().getName(), Font.BOLD, 46));
+        topPanel.add(title, BorderLayout.CENTER);
         JLabel restartClickableLabel = new JLabel();
         try {
             BufferedImage icon = read(new File("src/main/resources/restartIcon.png"));
@@ -133,8 +139,8 @@ public class Swing2048 extends JPanel implements Observer {
                 game.restart();
             }
         });
-        endScreen.add(restartClickableLabel, BorderLayout.EAST);
-        return endScreen;
+        topPanel.add(restartClickableLabel, BorderLayout.EAST);
+        return topPanel;
     }
 
 
