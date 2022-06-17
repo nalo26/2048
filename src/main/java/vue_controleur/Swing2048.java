@@ -33,16 +33,19 @@ import static modele.Direction.*;
 
 public class Swing2048 extends JPanel implements Observer {
     public static final int PIXEL_PER_SQUARE = 150;
+    private final Container mainContent;
     // tableau de cases : i, j -> case graphique
     protected JLabel[][] tabC;
     protected Game game;
     protected final Map<Integer, Color> caseColor;
     protected final List<CaseColors> colorList = asList(CaseColors.values());
+    private JPanel contentPanel;
+    private Dimension gameContentSize;
 
     public Swing2048(Game _jeu) {
         game = _jeu;
         addKeyListener();
-        Container mainContent = new Container();
+        mainContent = new Container();
         mainContent.setLayout(new BorderLayout());
         Component topComponent = generateTopComponent();
         mainContent.add(topComponent, PAGE_START);
@@ -57,9 +60,10 @@ public class Swing2048 extends JPanel implements Observer {
 
     }
 
-    protected JPanel getGameContentPanel() {
-        JPanel contentPanel = new JPanel(new GridLayout(game.getSize(), game.getSize()));
-        contentPanel.setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, game.getSize() * PIXEL_PER_SQUARE));
+    public JPanel getGameContentPanel() {
+        contentPanel = new JPanel(new GridLayout(game.getSize(), game.getSize()));
+        gameContentSize = new Dimension(game.getSize() * PIXEL_PER_SQUARE, game.getSize() * PIXEL_PER_SQUARE);
+        contentPanel.setPreferredSize(gameContentSize);
         Border border = createLineBorder(darkGray, 5);
         for (int i = 0; i < game.getSize(); i++) {
             for (int j = 0; j < game.getSize(); j++) {
@@ -102,8 +106,13 @@ public class Swing2048 extends JPanel implements Observer {
 
                 }
             }
-            if (game.isGameOver()) {
-                generateTopComponent();
+            if (game.isGameOver() || game.isGameWon()) {
+                EndScreen endScreen = new EndScreen(this, game.isGameOver() ? "YOU LOSE 🤡🤡 !" : "YOU WIN 👑👑 !");
+                endScreen.setVisible(true);
+                mainContent.remove(contentPanel);
+                mainContent.add(endScreen);
+                endScreen.requestFocusInWindow();
+                updateUI();
             }
         });
 
@@ -111,15 +120,15 @@ public class Swing2048 extends JPanel implements Observer {
     }
 
     private Component generateTopComponent() {
-        JPanel endScreen = new JPanel(new BorderLayout(game.getSize(), game.getSize()));
-        endScreen.setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, PIXEL_PER_SQUARE / 2));
-        endScreen.setBackground(Color.BLACK);
-        endScreen.setOpaque(false);
-        endScreen.setForeground(Color.BLACK);
+        JPanel topPanel = new JPanel(new BorderLayout(game.getSize(), game.getSize()));
+        topPanel.setPreferredSize(new Dimension(game.getSize() * PIXEL_PER_SQUARE, PIXEL_PER_SQUARE / 2));
+        topPanel.setBackground(Color.BLACK);
+        topPanel.setOpaque(false);
+        topPanel.setForeground(Color.BLACK);
 
-        JLabel endLabel = new JLabel("2048 - Score : " + game.getScore(), SwingConstants.LEFT);
-        endLabel.setFont(new Font(endLabel.getFont().getName(), Font.BOLD, 46));
-        endScreen.add(endLabel, BorderLayout.CENTER);
+        JLabel title = new JLabel("2048 - Score : " + game.getScore(), SwingConstants.LEFT);
+        title.setFont(new Font(title.getFont().getName(), Font.BOLD, 46));
+        topPanel.add(title, BorderLayout.CENTER);
         JLabel restartClickableLabel = new JLabel();
         try {
             BufferedImage icon = read(new File("src/main/resources/restartIcon.png"));
@@ -133,8 +142,8 @@ public class Swing2048 extends JPanel implements Observer {
                 game.restart();
             }
         });
-        endScreen.add(restartClickableLabel, BorderLayout.EAST);
-        return endScreen;
+        topPanel.add(restartClickableLabel, BorderLayout.EAST);
+        return topPanel;
     }
 
 
@@ -158,6 +167,8 @@ public class Swing2048 extends JPanel implements Observer {
                     case KeyEvent.VK_UP:
                         game.move(UP);
                         break;
+                    case KeyEvent.VK_ESCAPE:
+                        System.exit(0);
                 }
             }
         });
@@ -166,5 +177,21 @@ public class Swing2048 extends JPanel implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         refresh();
+    }
+
+    public Container getMainContent() {
+        return mainContent;
+    }
+
+    public JPanel getContentPanel() {
+        return contentPanel;
+    }
+
+    public void restartGame() {
+        game.restart();
+    }
+
+    public Dimension getGameContentSize() {
+        return gameContentSize;
     }
 }
