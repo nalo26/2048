@@ -7,7 +7,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import static java.awt.BorderLayout.CENTER;
-import static vue_controleur.Swing2048.PIXEL_PER_SQUARE;
 
 public class EndScreen extends JPanel {
 
@@ -15,12 +14,14 @@ public class EndScreen extends JPanel {
         setLayout(new BorderLayout());
         setPreferredSize(view.getGameContentSize());
         setBackground(new Color(100, 100, 100, 100));
-        JLabel endLabel = new JLabel(text);
         Font font = new Font("serif", Font.PLAIN, 40);
-        endLabel.setFont(font);
-        endLabel.setHorizontalAlignment(JLabel.CENTER);
-        endLabel.setVerticalAlignment(JLabel.CENTER);
+        JLabel endLabel = createEndMessage(text, font);
         add(endLabel, CENTER);
+        JLabel restart = createRestartButton(view, font);
+        add(restart, BorderLayout.SOUTH);
+    }
+
+    private JLabel createRestartButton(Swing2048 view, Font font) {
         JLabel restart = new JLabel("Restart");
         restart.setFont(font);
         restart.addMouseListener(new MouseAdapter() {
@@ -33,6 +34,14 @@ public class EndScreen extends JPanel {
                 updateUI();
             }
         });
-        add(restart, BorderLayout.SOUTH);
+        return restart;
+    }
+
+    private JLabel createEndMessage(String text, Font font) {
+        JLabel endLabel = new JLabel(text);
+        endLabel.setFont(font);
+        endLabel.setHorizontalAlignment(JLabel.CENTER);
+        endLabel.setVerticalAlignment(JLabel.CENTER);
+        return endLabel;
     }
 }

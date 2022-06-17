@@ -167,6 +167,8 @@ public class Swing2048 extends JPanel implements Observer {
                     case KeyEvent.VK_UP:
                         game.move(UP);
                         break;
+                    case KeyEvent.VK_ESCAPE:
+                        System.exit(0);
                 }
             }
         });
@@ -180,12 +182,15 @@ public class Swing2048 extends JPanel implements Observer {
     public Container getMainContent() {
         return mainContent;
     }
+
     public JPanel getContentPanel() {
         return contentPanel;
     }
-    public void restartGame(){
+
+    public void restartGame() {
         game.restart();
     }
+
     public Dimension getGameContentSize() {
         return gameContentSize;
     }
