@@ -41,6 +41,7 @@ public class Swing2048 extends JPanel implements Observer {
     protected final List<CaseColors> colorList = asList(CaseColors.values());
     private JPanel contentPanel;
     private Dimension gameContentSize;
+    private JLabel gameTitle;
 
     public Swing2048(Game _jeu) {
         game = _jeu;
@@ -114,6 +115,7 @@ public class Swing2048 extends JPanel implements Observer {
                 endScreen.requestFocusInWindow();
                 updateUI();
             }
+            gameTitle.setText("2048 - Score : " + game.getScore());
         });
 
 
@@ -126,9 +128,9 @@ public class Swing2048 extends JPanel implements Observer {
         topPanel.setOpaque(false);
         topPanel.setForeground(Color.BLACK);
 
-        JLabel title = new JLabel("2048 - Score : " + game.getScore(), SwingConstants.LEFT);
-        title.setFont(new Font(title.getFont().getName(), Font.BOLD, 46));
-        topPanel.add(title, BorderLayout.CENTER);
+        gameTitle = new JLabel("2048 - Score : " + game.getScore(), SwingConstants.LEFT);
+        gameTitle.setFont(new Font(gameTitle.getFont().getName(), Font.BOLD, 46));
+        topPanel.add(gameTitle, BorderLayout.CENTER);
         JLabel restartClickableLabel = new JLabel();
         try {
             BufferedImage icon = read(new File("src/main/resources/restartIcon.png"));
