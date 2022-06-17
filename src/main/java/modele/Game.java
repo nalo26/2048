@@ -13,7 +13,7 @@ public class Game extends Observable implements Cloneable {
     private Case[][] tabCases;
     private Map<Location, Case> posCases = new HashMap<Location, Case>();
     private int score;
-    public static final Random RANDOM = new Random(10);
+    public static final Random RANDOM = new Random();
 
     private static final List<Location> BORDERS = new ArrayList<>();
 
